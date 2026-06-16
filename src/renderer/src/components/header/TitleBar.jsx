@@ -1,4 +1,5 @@
 import React, {memo} from 'react';
+import { Minus, Square, X } from 'lucide-react';
 
 // ============================================================
 // Custom frameless title bar for Electron
@@ -47,9 +48,7 @@ const TitleBar  = ({
                     justify-center transition-colors hover:bg-[#444444]"
           title="Minimize"
         >
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-          </svg>
+          <Minus className="h-3 w-3" strokeWidth={2} />
         </button>
         )}
         
@@ -63,9 +62,7 @@ const TitleBar  = ({
 
           title="Maximize"
         >
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <rect x="4" y="4" width="16" height="16" rx="1" />
-          </svg>
+          <Square className="h-3 w-3" strokeWidth={2} />
         </button>
         )}
 
@@ -75,9 +72,7 @@ const TitleBar  = ({
           className="flex h-full w-11 items-center justify-center transition-colors hover:bg-red-600 hover:text-white"
           title="Close"
         >
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="h-3 w-3" strokeWidth={2} />
         </button>
       </div>
     </div>

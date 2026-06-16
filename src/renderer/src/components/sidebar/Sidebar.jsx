@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import SidebarContext, { useSidebar } from './sidebarContext';
 export { default as SidebarHeader } from './SidebarHeader.jsx';
 export { default as SidebarFooter } from './SidebarFooter.jsx';
@@ -256,14 +257,10 @@ export const SidebarItem = memo(({
 
         {/* Expand icon */}
         {expandable && (isExpanded || !collapsed) && (
-          <svg
+          <ChevronRight
             className={`w-4 h-4 transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+            strokeWidth={2}
+          />
         )}
 
         {/* Tooltip for collapsed state */}
@@ -309,14 +306,10 @@ export const SidebarGroup = memo(({
         >
           <span>{label}</span>
           {collapsible && (
-            <svg
+            <ChevronDown
               className={`w-3 h-3 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+              strokeWidth={2}
+            />
           )}
         </div>
       )}

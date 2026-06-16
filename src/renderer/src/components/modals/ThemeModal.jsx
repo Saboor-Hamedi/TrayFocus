@@ -1,4 +1,5 @@
 import React, { memo, useState, useMemo, useEffect, useRef } from 'react';
+import { Search } from 'lucide-react';
 import TitleBar from '../header/TitleBar';
 import { getThemeNames } from '../../theme';
 
@@ -97,9 +98,7 @@ const ThemeModal = ({
                 <div className="px-4 pt-2 pb-3">
                     <div className="relative">
                         {/* search icon (magnifying glass) */}
-                        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-                        </svg>
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/15" strokeWidth={2} />
                         <input
                             ref={inputRef}
                             type="text"
@@ -118,9 +117,7 @@ const ThemeModal = ({
                     {/* empty state — shown when search has no matches */}
                     {filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center gap-1.5 h-full">
-                            <svg className="h-5 w-5 text-white/10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-                            </svg>
+                            <Search className="h-5 w-5 text-white/10" strokeWidth={1.5} />
                             <span className="text-[10px] text-white/15">No themes match "{search}"</span>
                             <button
                                 onClick={() => setSearch('')}

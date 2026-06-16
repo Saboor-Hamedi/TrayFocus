@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { ChevronsLeft, X } from 'lucide-react';
 import { useSidebar } from './sidebarContext';
 
 // ============================================================
@@ -50,21 +51,12 @@ const SidebarHeader = memo(({
             className={`p-1.5 rounded-lg transition-colors ${style.hover}`}
             title={collapsed ? 'Expand' : 'Collapse'}
           >
-            <svg
+            <ChevronsLeft
               className={`w-4 h-4 transition-transform duration-300 ${
                 collapsed ? 'rotate-180' : ''
               }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-              />
-            </svg>
+              strokeWidth={2}
+            />
           </button>
         )}
 
@@ -74,9 +66,7 @@ const SidebarHeader = memo(({
             className={`p-1.5 rounded-lg transition-colors ${style.hover}`}
             title="Close sidebar"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-4 h-4" strokeWidth={2} />
           </button>
         )}
       </div>

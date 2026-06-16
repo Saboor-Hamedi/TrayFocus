@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
+import { Search } from 'lucide-react';
 
 // ============================================================
 // Command palette — a Spotlight / VS Code style searchable
@@ -172,9 +173,7 @@ const CommandPalette = memo(({
           {/* Search Input */}
           <div className="relative">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg className={`w-4 h-4 ${style.textMuted}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className={`w-4 h-4 ${style.textMuted}`} strokeWidth={2} />
             </div>
             <input
               ref={inputRef}

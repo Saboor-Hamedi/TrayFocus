@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import { Search } from 'lucide-react';
 import TitleBar from '../header/TitleBar';
 import Notification from './Notification';
 import SettingsItem from '../settings/SettingsItem';
@@ -286,9 +287,7 @@ export const SettingsModal = ({
               {showSearch && (
                 <div className="px-6 pt-4 pb-3 border-b border-zinc-800/50">
                   <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" strokeWidth={2} />
                     <input
                       type="text"
                       value={searchQuery}
