@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Info, CheckCircle, AlertTriangle, X } from 'lucide-react';
 
 const typeMap = {
@@ -17,17 +17,20 @@ const iconMap = {
 
 const Notification = ({ isOpen, onClose, message, type = 'info', duration = 3000, position = 'top-center' }) => {
   const [progress, setProgress] = useState(100);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen || duration === 0) return;
+    setProgress(100);
     const start = Date.now();
     const timer = setInterval(() => {
       const r = Math.max(0, 100 - ((Date.now() - start) / duration) * 100);
       setProgress(r);
-      if (r <= 0) { clearInterval(timer); onClose?.(); }
+      if (r <= 0) { clearInterval(timer); onCloseRef.current?.(); }
     }, 50);
     return () => clearInterval(timer);
-  }, [isOpen, duration, onClose]);
+  }, [isOpen, duration]);
 
   if (!isOpen) return null;
 
