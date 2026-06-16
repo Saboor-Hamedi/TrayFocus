@@ -53,36 +53,12 @@ function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // Active content page
-  const [activePage, setActivePage] = useState('chat');
+  const [activePage, setActivePage] = useState(() => {
+    try { return localStorage.getItem('trayfocus-page') || 'chat'; } catch { return 'chat'; }
+  });
 
-  // Whether the shortcut cheatsheet is open
-  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
-
-  // Update status (from main process auto-updater)
-  const [updateStatus, setUpdateStatus] = useState(null);
-  const [checking, setChecking] = useState(false);
-
-  // Currently active theme ID — loaded from settings.json on mount
-  const [activeTheme, setActiveTheme] = useState('zinc');
-
-  // Persistent settings loaded from settings.json
-  const [settingsValues, setSettingsValues] = useState({});
-  const [settingsLoaded, setSettingsLoaded] = useState(false);
-  const [alwaysOnTop, setAlwaysOnTop] = useState(false);
-
-  useEffect(() => {
-    settings.load().then((data) => {
-      setActiveTheme(data.theme || 'zinc');
-      setActivePage(data.activePage || 'chat');
-      setSettingsValues(data);
-      setAlwaysOnTop(data.alwaysOnTop || false);
-      if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
-      setSettingsLoaded(true);
-    });
-  }, []);
-
-  // Persist active page
-  useEffect(() => { settings.save({ activePage }); }, [activePage]);
+  // Sync active page to localStorage (instant) and settings (persistent)
+  useEffect(() => { try { localStorage.setItem('trayfocus-page', activePage); } catch {}; settings.save({ activePage }); }, [activePage]);
 
   // Listen for update events from main process
   useEffect(() => {

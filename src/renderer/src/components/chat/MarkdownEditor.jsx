@@ -92,15 +92,13 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
     return () => { viewRef.current?.destroy(); viewRef.current = null; };
   }, []);
 
-  // Attach Ctrl+\ shortcut to the editor DOM element
+  // Ctrl+\ toggles preview regardless of focus (document-level listener)
   useEffect(() => {
-    if (!viewRef.current) return;
-    const el = viewRef.current.dom;
     const handler = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); togglePreview(); }
     };
-    el.addEventListener('keydown', handler);
-    return () => el.removeEventListener('keydown', handler);
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, [togglePreview]);
 
   useEffect(() => {
