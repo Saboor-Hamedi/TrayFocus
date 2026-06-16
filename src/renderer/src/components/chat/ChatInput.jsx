@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Square } from 'lucide-react';
 import Markdown from './Markdown';
 
@@ -23,14 +23,6 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
   const [value, setValue] = useState('');
   const textareaRef = useRef(null);
 
-  const adjustHeight = useCallback(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }, []);
-
-  useEffect(() => { adjustHeight(); }, [value, adjustHeight]);
   useEffect(() => { if (!loading) textareaRef.current?.focus(); }, [loading]);
 
   const handleSend = () => {
@@ -38,12 +30,11 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
     if (!text || loading) return;
     onSend(text);
     setValue('');
-    setTimeout(() => adjustHeight(), 0);
   };
 
   return (
-    <div className="px-3 py-2 border-t border-white/[0.06]">
-      <div className="relative">
+    <div className="px-4 py-2 border-t border-white/[0.06]">
+      <div className="relative max-w-lg mx-auto">
         <textarea
           ref={textareaRef}
           value={value}
@@ -54,7 +45,7 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
           placeholder={disabled && !loading ? 'Set API key in Settings → AI' : placeholder}
           disabled={disabled && !loading}
           rows={1}
-          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1.5 pr-8 text-xs text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text"
+          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1 pr-8 text-[11px] text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text max-h-[32px] overflow-y-auto"
           spellCheck={false}
         />
         <div className="absolute bottom-1.5 right-1.5">

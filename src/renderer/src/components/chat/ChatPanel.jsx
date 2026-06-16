@@ -86,7 +86,7 @@ const ChatPanel = ({ apiKey, providerId, model }) => {
         )}
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-lg mx-auto w-full">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
             <Sparkles className="w-6 h-6 text-white/8 mb-3" />
