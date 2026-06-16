@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, ChevronRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { getThemeNames } from '../../theme';
 import { getAll } from '../../utils/ShortcutManager';
 
@@ -32,24 +32,24 @@ const CommandPalette = ({
   // When mode prop changes (e.g. Ctrl+Shift+P pressed while palette open), update
   useEffect(() => { setInternalMode(null); }, [mode]);
 
-  // When typing '>', strip it and switch to spotlight. When in spotlight and input
-  // is cleared, switch back to commands.
+  // When typing '>', switch to spotlight and keep '>' visible like VS Code.
+  // When deleting '>' in spotlight, switch back to commands.
   const handleChange = (v) => {
-    if (!isSpotlight && v === '>') {
-      setSearch('');
+    if (!isSpotlight && v.startsWith('>')) {
       setInternalMode('spotlight');
+      setSearch(v);
       return;
     }
-    if (isSpotlight && v === '') {
+    if (isSpotlight && !v.startsWith('>')) {
       setInternalMode('commands');
-      setSearch('');
+      setSearch(v.replace(/^>\s*/, ''));
       return;
     }
     setSearch(v);
   };
 
-  // Query to filter: use search text directly, stripping any '>' if somehow present
-  const query = search.replace(/^>\s*/, '');
+  // Search query: strip leading '> ' when in spotlight
+  const query = isSpotlight ? search.replace(/^>\s*/, '') : search;
 
   const filterResults = useCallback((q) => {
     if (!q.trim()) return [];
@@ -93,8 +93,8 @@ const CommandPalette = ({
   }, [query, filterResults]);
 
   useEffect(() => {
-    if (isOpen) { setSearch(''); setInternalMode(null); setSelectedIndex(0); setTimeout(() => inputRef.current?.focus(), 20); }
-  }, [isOpen]);
+    if (isOpen) { setSearch(mode === 'spotlight' ? '> ' : ''); setInternalMode(null); setSelectedIndex(0); setTimeout(() => inputRef.current?.focus(), 20); }
+  }, [isOpen, mode]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -153,8 +153,7 @@ const CommandPalette = ({
       <div className={`relative w-full max-w-lg ${className}`}>
         <div className={`rounded-xl border ${style.border} ${style.bg} shadow-2xl backdrop-blur-xl overflow-hidden`}>
           <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center gap-1 pointer-events-none">
-              {isSpotlight && <ChevronRight className="w-3.5 h-3.5 text-white/20" strokeWidth={2} />}
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Search className="w-4 h-4 text-white/30" strokeWidth={1.5} />
             </div>
             <input
@@ -163,7 +162,7 @@ const CommandPalette = ({
               value={search}
               onChange={(e) => handleChange(e.target.value)}
               placeholder={isSpotlight ? 'Search anything...' : placeholder}
-              className={`w-full pl-12 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
+              className={`w-full pl-8 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
               spellCheck={false}
               autoComplete="off"
             />
