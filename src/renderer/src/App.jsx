@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { House, Palette, Cog, Zap, Keyboard, Wrench } from 'lucide-react';
+import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -7,8 +7,9 @@ import CommandPalette from './components/content/CommandPalette';
 import ShortcutsPanel from './components/settings/ShortcutsPanel';
 import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
+import AccentPanel from './components/settings/AccentPanel';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
-import { getTheme, getThemeClass, getAccentClass } from './theme';
+import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
 import * as settings from './utils/settingsManager';
 import pkg from '../../../package.json';
@@ -215,7 +216,8 @@ function App() {
 
   // className string for the root wrapper div (background + text color)
   const themeClass = getThemeClass(activeTheme);
-  const accentClass = useMemo(() => getAccentClass(activeTheme), [activeTheme]);
+  const accentId = settingsValues.accent || 'blue';
+  const accentClass = useMemo(() => `text-${accentId}-400`, [accentId]);
 
   const settingsStyle = useMemo(() => ({
     bg: 'bg-zinc-900/95',
@@ -350,12 +352,14 @@ function App() {
         categories={[
           { id: 'general', label: 'General', icon: <Zap className="w-3.5 h-3.5" strokeWidth={1.5} /> },
           { id: 'appearance', label: 'Appearance', icon: <Palette className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+          { id: 'accent', label: 'Accent', icon: <PaintBucket className="w-3.5 h-3.5" strokeWidth={1.5} /> },
           { id: 'shortcuts', label: 'Shortcuts', icon: <Keyboard className="w-3.5 h-3.5" strokeWidth={1.5} /> },
           { id: 'advanced', label: 'Advanced', icon: <Wrench className="w-3.5 h-3.5" strokeWidth={1.5} /> },
         ]}
         customSections={{
           shortcuts: <ShortcutsPanel />,
           appearance: <AppearancePanel />,
+          accent: <AccentPanel />,
           advanced: <AdvancedPanel />,
         }}
         onSave={(values) => {

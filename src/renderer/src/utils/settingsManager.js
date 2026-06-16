@@ -8,6 +8,7 @@ const defaults = {
   minimizeToTray: true,
   showMaximize: true,
   alwaysOnTop: false,
+  accent: 'blue',
   displayName: 'User',
   fontSize: 14,
   compactMode: false,
