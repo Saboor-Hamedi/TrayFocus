@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { X, Command } from 'lucide-react';
 import { getAll } from '../../utils/ShortcutManager';
 
@@ -6,19 +6,13 @@ const modifiers = ['ctrl', 'shift', 'alt', 'meta'];
 
 const formatKeys = (s) => {
   const parts = [];
-  modifiers.forEach((m) => { if (s[m]) parts.push(m === 'meta' ? '⌘' : m.charAt(0).toUpperCase() + m.slice(1)); });
+  modifiers.forEach((m) => { if (s[m]) parts.push(m.charAt(0).toUpperCase() + m.slice(1)); });
   parts.push(s.key.toUpperCase());
   return parts;
 };
 
-const MODIFIER_MAP = { ctrl: 'Ctrl', shift: 'Shift', alt: 'Alt', meta: 'Win' };
-
 const ShortcutCheatsheet = ({ isOpen, onClose }) => {
-  const shortcuts = useMemo(() =>
-    getAll()
-      .filter((s) => s.description)
-      .sort((a, b) => a.description.localeCompare(b.description)),
-  []);
+  const shortcuts = getAll().filter((s) => s.description).sort((a, b) => a.description.localeCompare(b.description));
 
   useEffect(() => {
     if (!isOpen) return;
