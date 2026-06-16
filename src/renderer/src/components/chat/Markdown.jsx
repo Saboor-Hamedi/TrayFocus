@@ -1,26 +1,24 @@
 import React, { useMemo, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 import hljs from 'highlight.js/lib/common';
+import 'highlight.js/styles/github-dark.min.css';
 
 marked.setOptions({
   breaks: true,
   gfm: true,
-  highlight: (code, lang) => {
-    if (lang && hljs.getLanguage(lang)) {
-      try { return hljs.highlight(code, { language: lang, ignoreIllegals: true }).value; }
-      catch { return code; }
-    }
-    return code;
-  },
 });
 
 const renderer = new marked.Renderer();
 renderer.code = ({ text, lang }) => {
   const label = lang || 'text';
-  const escaped = lang && hljs.getLanguage(lang)
-    ? (() => { try { return hljs.highlight(text, { language: lang, ignoreIllegals: true }).value; } catch { return text; } })()
-    : text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return `<div class="cb-wrap"><div class="cb-head"><span>${label}</span><button class="cb-btn" data-code="${encodeURIComponent(text)}">Copy</button></div><pre><code class="hljs${lang ? ` language-${lang}` : ''}">${escaped}</code></pre></div>`;
+  let highlighted;
+  if (lang && hljs.getLanguage(lang)) {
+    try { highlighted = hljs.highlight(text, { language: lang, ignoreIllegals: true }).value; }
+    catch { highlighted = text.replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  } else {
+    highlighted = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  return `<div class="cb-wrap"><div class="cb-head"><span>${label}</span><button class="cb-btn" data-code="${encodeURIComponent(text)}">Copy</button></div><pre><code class="hljs${lang ? ` language-${lang}` : ''}">${highlighted}</code></pre></div>`;
 };
 
 const Markdown = ({ content, fontSize = 14 }) => {
