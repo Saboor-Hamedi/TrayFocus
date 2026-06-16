@@ -24,6 +24,16 @@ renderer.code = ({ text, lang }) => {
 const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
   const ref = useRef(null);
 
+  // Color map for known accent classes — used to style inline code
+  const accentHex = accentColor.replace('text-', '').replace(/-(\d+)$/, '') || 'blue';
+  const colorMap = useMemo(() => ({
+    blue: '#60a5fa', sky: '#38bdf8', cyan: '#22d3ee', teal: '#2dd4bf',
+    green: '#4ade80', emerald: '#34d399', lime: '#a3e635', yellow: '#facc15',
+    amber: '#fbbf24', orange: '#fb923c', red: '#f87171', rose: '#fb7185',
+    pink: '#f472b6', fuchsia: '#e879f9', purple: '#c084fc', violet: '#a78bfa', indigo: '#818cf8',
+  }), []);
+  const accentValue = colorMap[accentHex] || accentColor;
+
   const html = useMemo(() => {
     try { return marked.parse(content, { async: false, renderer }); }
     catch { return content; }
@@ -48,15 +58,13 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
       handlers.push([btn, handler]);
     });
 
-    // Apply accent color to inline code (not code blocks)
-    if (accentColor) {
-      const color = getComputedStyle(ref.current).color; // from the accent text class on parent
-      const inlineCodes = ref.current.querySelectorAll(':not(pre) > code');
-      inlineCodes.forEach((el) => {
-        el.style.color = color;
-        el.style.background = color.replace(')', ', 0.1)').replace('rgb(', 'rgba(');
-      });
-    }
+    // Apply accent to inline code only
+    const inlineCodes = ref.current.querySelectorAll(':not(pre) > code');
+    inlineCodes.forEach((el) => {
+      el.style.color = accentValue;
+      el.style.background = accentValue + '15';
+      el.style.fontWeight = '500';
+    });
 
     return () => handlers.forEach(([b, h]) => b.removeEventListener('click', h));
   }, [html, accentColor]);
@@ -66,7 +74,7 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
   return (
     <div
       ref={ref}
-      className={accentColor + ' ' +
+      className={
         'prose prose-invert max-w-none font-sans leading-relaxed break-words ' +
         '[&_.cb-wrap]:my-2 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.06] [&_.cb-wrap]:bg-black/30 ' +
         '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-1 [&_.cb-head]:border-b [&_.cb-head]:border-white/[0.04] [&_.cb-head]:text-[10px] [&_.cb-head]:text-white/25 [&_.cb-head]:font-mono ' +
