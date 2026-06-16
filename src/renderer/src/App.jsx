@@ -49,8 +49,14 @@ function App() {
   // Currently active theme ID — loaded from settings.json on mount
   const [activeTheme, setActiveTheme] = useState('zinc');
 
+  // Persistent settings loaded from settings.json
+  const [settingsValues, setSettingsValues] = useState({});
+
   useEffect(() => {
-    settings.loadTheme().then(setActiveTheme);
+    settings.load().then((data) => {
+      setActiveTheme(data.theme || 'zinc');
+      setSettingsValues(data);
+    });
   }, []);
 
   // ---- callbacks ----
@@ -283,6 +289,7 @@ function App() {
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+        initialValues={settingsValues}
         title="Settings"
         settings={[
           { key: 'autostart', category: 'general', label: 'Launch at startup', description: 'Start TrayFocus when you log in', type: 'switch', defaultValue: false },
@@ -300,7 +307,7 @@ function App() {
           appearance: <AppearancePanel />,
           advanced: <AdvancedPanel />,
         }}
-        onSave={(values) => settings.save(values)}
+        onSave={(values) => { setSettingsValues(values); settings.save(values); }}
       />
     </div>
   );
