@@ -13,7 +13,7 @@ import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } fro
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
 import * as settings from './utils/settingsManager';
-import pkg from '../../../package.json';
+// import pkg from '../../../package.json';
 
 // ============================================================
 // Root application component
@@ -322,24 +322,44 @@ function App() {
           <p className="text-xs font-medium opacity-60 mb-1">TrayFocus</p>
           <p className="text-[10px] opacity-25 mb-4">v{pkg.version}</p>
 
-          {updateStatus?.status === 'available' && (
-            <p className="text-[10px] text-blue-400/80 mb-2">
-              v{updateStatus.version} available — restart to update
-            </p>
-          )}
-          {updateStatus?.status === 'downloading' && (
-            <p className="text-[10px] text-blue-400/80 mb-2">
-              Downloading update... {updateStatus.percent}%
-            </p>
-          )}
-          {updateStatus?.status === 'downloaded' && (
-            <button onClick={() => ipcSend('install-update')} className="text-[10px] text-green-400/80 hover:underline mb-2">
-              Update ready — restart now
-            </button>
-          )}
-          {updateStatus?.status === 'not-available' && (
-            <p className="text-[10px] text-white/20 mb-2">Up to date</p>
-          )}
+          <div className="mb-4">
+            {updateStatus?.status === 'downloaded' ? (
+              <button
+                onClick={() => ipcSend('install-update')}
+                className="px-4 py-1.5 text-[11px] font-medium rounded-md bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20 transition-colors"
+              >
+                Restart to Update
+              </button>
+            ) : updateStatus?.status === 'downloading' ? (
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-40 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full rounded-full bg-blue-500 transition-all duration-300" style={{ width: `${updateStatus.percent || 0}%` }} />
+                </div>
+                <span className="text-[10px] text-white/30">Downloading {updateStatus.percent}%</span>
+              </div>
+            ) : updateStatus?.status === 'available' ? (
+              <button
+                onClick={() => { setChecking(true); ipcSend('download-update'); }}
+                className="px-4 py-1.5 text-[11px] font-medium rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-colors"
+              >
+                Download v{updateStatus.version}
+              </button>
+            ) : (
+              <button
+                onClick={() => { setChecking(true); ipcSend('check-for-updates'); setTimeout(() => setChecking(false), 5000); }}
+                disabled={checking}
+                className={`px-4 py-1.5 text-[11px] font-medium rounded-md transition-colors border ${
+                  checking
+                    ? 'bg-white/5 text-white/20 border-white/5 cursor-not-allowed'
+                    : updateStatus?.status === 'not-available'
+                      ? 'bg-white/5 text-white/30 border-white/5 hover:bg-white/10'
+                      : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
+                }`}
+              >
+                {checking ? 'Checking...' : updateStatus?.status === 'not-available' ? 'Up to Date' : 'Check for Updates'}
+              </button>
+            )}
+          </div>
 
           <p className="text-[10px] opacity-25">
             <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+B</kbd> Sidebar &nbsp;
