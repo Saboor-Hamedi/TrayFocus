@@ -9,6 +9,7 @@ import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import AccentPanel from './components/settings/AccentPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
+import SpotlightSearch from './components/modals/SpotlightSearch';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
@@ -50,6 +51,8 @@ function App() {
 
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
+
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -312,6 +315,7 @@ function App() {
         showMaximize={settingsValues.showMaximize !== false}
         pinned={alwaysOnTop}
         updateStatus={updateStatus}
+        appVersion={pkg.version}
         onCheckUpdate={() => ipcSend('check-for-updates')}
         onDownloadUpdate={() => ipcSend('download-update')}
         onInstallUpdate={() => ipcSend('install-update')}

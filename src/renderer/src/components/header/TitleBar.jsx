@@ -11,6 +11,7 @@ const TitleBar  = ({
     pinned = false,
     titleColor = '',
     updateStatus = null,
+    appVersion = '1.0.0',
     onCheckUpdate,
     onDownloadUpdate,
     onInstallUpdate,
@@ -101,7 +102,7 @@ const TitleBar  = ({
                 </>
               ) : (
                 <p className="text-[11px] text-white/60">
-                  {updateStatus?.status === 'not-available' ? 'You\'re up to date' : 'v1.0.0'}
+                  {updateStatus?.status === 'not-available' ? 'You\'re up to date' : `v${appVersion}`}
                 </p>
               )}
             </div>
