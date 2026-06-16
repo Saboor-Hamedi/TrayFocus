@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, createContext, useContext } from 'r
 import { Search } from 'lucide-react';
 import TitleBar from '../header/TitleBar';
 import Notification from './Notification';
+import ConfirmModal from './ConfirmModal';
 import SettingsItem from '../settings/SettingsItem';
 
 // Context for settings
@@ -44,6 +45,7 @@ export const SettingsModal = ({
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [notif, setNotif] = useState({ open: false, type: 'success', message: '' });
+  const [confirm, setConfirm] = useState({ open: false, title: '', message: '', onConfirm: null });
   const modalRef = useRef(null);
 
   // Reset values when modal opens (only on open transition, not every render)
@@ -68,9 +70,7 @@ export const SettingsModal = ({
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         if (isDirty) {
-          if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
-            onClose();
-          }
+          handleClose();
         } else {
           onClose();
         }
@@ -161,23 +161,39 @@ export const SettingsModal = ({
 
   // Handle reset
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all settings to default?')) {
-      setValues(initialValues);
-      setIsDirty(false);
-      setErrors({});
-      onReset?.();
-      setNotif({ open: true, type: 'info', message: 'Settings reset to default' });
-    }
+    setConfirm({
+      open: true,
+      title: 'Reset Settings',
+      message: 'This will reset all settings to their default values.',
+      onConfirm: () => {
+        setValues(initialValues);
+        setIsDirty(false);
+        setErrors({});
+        onReset?.();
+        setNotif({ open: true, type: 'info', message: 'Settings reset to default' });
+        setConfirm({ open: false, title: '', message: '', onConfirm: null });
+      },
+    });
   };
 
   // Handle close with unsaved changes
   const handleClose = () => {
     if (isDirty) {
-      if (window.confirm('You have unsaved changes. Do you want to save before closing?')) {
-        handleSave();
-      } else {
-        onClose();
-      }
+      setConfirm({
+        open: true,
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Do you want to save?',
+        confirmText: 'Save',
+        confirmVariant: 'primary',
+        onConfirm: () => {
+          handleSave();
+          setConfirm({ open: false, title: '', message: '', onConfirm: null });
+        },
+        onCancel: () => {
+          onClose();
+          setConfirm({ open: false, title: '', message: '', onConfirm: null });
+        },
+      });
     } else {
       onClose();
     }
@@ -366,6 +382,17 @@ export const SettingsModal = ({
           </div>
         </div>
       </div>
+
+      {/* Confirm dialog for reset / unsaved changes */}
+      <ConfirmModal
+        isOpen={confirm.open}
+        onClose={() => setConfirm({ open: false, title: '', message: '', onConfirm: null })}
+        onConfirm={confirm.onConfirm}
+        title={confirm.title}
+        message={confirm.message}
+        confirmText={confirm.confirmText || 'Reset'}
+        confirmVariant={confirm.confirmVariant || 'danger'}
+      />
     </SettingsContext.Provider>
   );
 };
