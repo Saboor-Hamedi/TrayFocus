@@ -1,24 +1,5 @@
-import React, {memo} from 'react';
-import { Minus, Square, X, Pin } from 'lucide-react';
-
-// ============================================================
-// Custom frameless title bar for Electron
-//
-// Renders the window controls (minimize, maximize, close) and
-// a draggable title region. The [app-region:drag] CSS property
-// is Electron-specific — it marks the area that can be dragged
-// to move the window.
-//
-// Props:
-//   title         - text shown in the draggable area
-//   onMinimize    - callback for minimize button
-//   onMaximize    - callback for maximize button
-//   onClose       - callback for close button
-//   showMinimize  - hide the minimize button (default: true)
-//   showMaximize  - hide the maximize button (default: true)
-//   backgroundColor - Tailwind class for the bar background
-//   textColor     - Tailwind class for text / icon color
-// ============================================================
+import React, { memo, useState, useRef, useEffect } from 'react';
+import { Minus, Square, X, Pin, Download, RefreshCw } from 'lucide-react';
 
 const TitleBar  = ({
     title = "TrayFocus",
@@ -29,21 +10,93 @@ const TitleBar  = ({
     showMaximize = true,
     pinned = false,
     titleColor = '',
+    updateStatus = null,
+    onCheckUpdate,
+    onDownloadUpdate,
+    onInstallUpdate,
     backgroundColor = 'bg-zinc-800',
     textColor = 'text-zinc-100'
-}) =>{
+}) => {
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (!showDropdown) return;
+        const h = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setShowDropdown(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [showDropdown]);
+
+    const hasUpdate = updateStatus?.status === 'available' || updateStatus?.status === 'downloaded';
+    const isDownloading = updateStatus?.status === 'downloading';
+
     return (
         <>
 <div className={`flex h-8 w-full select-none items-center justify-between border-b border-zinc-800 ${backgroundColor} ${textColor}`}>
-      {/* ---- draggable area — clicking here moves the Electron window ---- */}
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
         <span className={`text-xs font-medium tracking-wide ${titleColor}`}>{title}</span>
         {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
+
+        {(hasUpdate || isDownloading) && (
+          <div className="relative ml-3 [app-region:no-drag]" ref={dropdownRef}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className={`flex items-center gap-1 h-5 px-1.5 rounded text-[9px] font-medium transition-colors ${
+                updateStatus?.status === 'downloaded'
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-blue-500/15 text-blue-400'
+              }`}
+            >
+              {isDownloading ? (
+                <RefreshCw className="h-2.5 w-2.5 animate-spin" strokeWidth={2.5} />
+              ) : (
+                <Download className="h-2.5 w-2.5" strokeWidth={2.5} />
+              )}
+              {isDownloading ? `${updateStatus.percent}%` : 'Update'}
+            </button>
+
+            {showDropdown && (
+              <div className="absolute top-full mt-1 left-0 w-56 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl overflow-hidden z-50">
+                <div className="px-3 py-2.5 border-b border-zinc-800">
+                  <p className="text-[10px] text-white/80 font-medium">
+                    {updateStatus?.status === 'downloaded' ? 'Update Ready' : 'Update Available'}
+                  </p>
+                  {updateStatus?.version && (
+                    <p className="text-[10px] text-zinc-400 mt-0.5">Version {updateStatus.version}</p>
+                  )}
+                </div>
+                <div className="p-2">
+                  {updateStatus?.status === 'available' && (
+                    <button
+                      onClick={() => { onDownloadUpdate?.(); setShowDropdown(false); }}
+                      className="w-full px-2 py-1.5 text-[10px] font-medium rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    >
+                      Download Update
+                    </button>
+                  )}
+                  {updateStatus?.status === 'downloaded' && (
+                    <button
+                      onClick={() => { onInstallUpdate?.(); setShowDropdown(false); }}
+                      className="w-full px-2 py-1.5 text-[10px] font-medium rounded bg-green-500 text-white hover:bg-green-600 transition-colors"
+                    >
+                      Restart to Update
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
+                    className="w-full mt-1 px-2 py-1.5 text-[10px] font-medium rounded text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Check Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ---- window control buttons — excluded from drag region ---- */}
       <div className="flex h-full items-center [app-region:no-drag]">
-        {/* minimize */}
         {showMinimize && (
 <button 
           onClick={onMinimize}
@@ -55,21 +108,17 @@ const TitleBar  = ({
         </button>
         )}
         
-
-        {/* maximize — hidden for non-resizable windows */}
         {showMaximize && (
         <button 
           onClick={onMaximize}
                    className="flex h-full w-11 items-center 
                     justify-center transition-colors hover:bg-[#444444]"
-
           title="Maximize"
         >
           <Square className="h-3 w-3" strokeWidth={2} />
         </button>
         )}
 
-        {/* close — turns red on hover */}
         <button 
           onClick={onClose}
           className="flex h-full w-11 items-center justify-center transition-colors hover:bg-red-600 hover:text-white"
@@ -81,8 +130,6 @@ const TitleBar  = ({
     </div>
         </>
     )
-
 }
 
-// memo prevents re-render when parent updates but TitleBar props haven't changed
 export default memo(TitleBar)
