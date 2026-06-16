@@ -30,6 +30,10 @@ const TitleBar  = ({
     const hasUpdate = updateStatus?.status === 'available' || updateStatus?.status === 'downloaded';
     const isDownloading = updateStatus?.status === 'downloading';
 
+    useEffect(() => {
+        if (updateStatus?.status) setShowDropdown(true);
+    }, [updateStatus?.status]);
+
     return (
         <>
 <div className={`flex h-8 w-full select-none items-center justify-between border-b border-zinc-800 ${backgroundColor} ${textColor}`}>
@@ -60,7 +64,7 @@ const TitleBar  = ({
             </button>
 
             {showDropdown && (
-              <div className="absolute top-full mt-1.5 -left-20 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-50">
+              <div className="absolute top-full mt-1.5 right-0 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-50">
                 <div className="px-3.5 py-2.5">
                   {hasUpdate ? (
                     <>
@@ -77,7 +81,9 @@ const TitleBar  = ({
                       </div>
                     </>
                   ) : (
-                    <p className="text-xs text-white/60">v1.0.0</p>
+                    <p className="text-xs text-white/60">
+                      {updateStatus?.status === 'not-available' ? 'Up to date' : 'v1.0.0'}
+                    </p>
                   )}
                 </div>
 
