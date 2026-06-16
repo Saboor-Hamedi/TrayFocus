@@ -51,11 +51,13 @@ function App() {
 
   // Persistent settings loaded from settings.json
   const [settingsValues, setSettingsValues] = useState({});
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   useEffect(() => {
     settings.load().then((data) => {
       setActiveTheme(data.theme || 'zinc');
       setSettingsValues(data);
+      setSettingsLoaded(true);
     });
   }, []);
 
@@ -286,6 +288,7 @@ function App() {
       />
 
       {/* ---- settings modal ---- */}
+      {settingsLoaded && (
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
@@ -309,6 +312,7 @@ function App() {
         }}
         onSave={(values) => { setSettingsValues(values); settings.save(values); }}
       />
+      )}
     </div>
   );
 }
