@@ -64,7 +64,7 @@ const TitleBar  = ({
             </button>
 
             {showDropdown && (
-              <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-50">
+              <div className="absolute top-full mt-1.5 left-0 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-50">
                 <div className="px-3.5 py-2.5">
                   {hasUpdate ? (
                     <>
