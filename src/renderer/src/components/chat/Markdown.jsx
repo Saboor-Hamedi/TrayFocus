@@ -61,8 +61,16 @@ const Markdown = ({ content, fontSize = 14 }) => {
         [&_.cb-wrap_code]:text-[11px] [&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed
         [&_pre_code]:text-inherit [&_pre_code]:bg-transparent [&_pre_code]:p-0
         [&_code]:bg-white/[0.06] [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[11px] [&_code]:font-mono
-        [&_p]:my-1.5 [&_ul]:my-1 [&_ul]:pl-4 [&_ol]:my-1 [&_ol]:pl-4
-        [&_li]:my-0.5 [&_strong]:font-semibold [&_em]:italic
+        [&_p]:my-1.5
+        [&_a]:text-blue-400 [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-blue-300 [&_a]:transition-colors
+        [&_hr]:border-white/[0.06] [&_hr]:my-3
+        [&_ul]:list-disc [&_ul]:my-1.5 [&_ul]:pl-5
+        [&_ol]:list-decimal [&_ol]:my-1.5 [&_ol]:pl-5
+        [&_li]:my-0.5 [&_li]:pl-1
+        [&_strong]:font-semibold [&_strong]:text-white/90
+        [&_em]:italic [&_em]:text-white/70
+        [&_del]:line-through [&_del]:text-white/40
+        [&_img]:rounded-lg [&_img]:my-2 [&_img]:max-w-full
         [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h1]:mt-4
         [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3
         [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1.5 [&_h3]:mt-2.5
