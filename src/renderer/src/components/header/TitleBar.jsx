@@ -110,7 +110,7 @@ const TitleBar  = ({
               <div className="px-4 pb-3">
                 {updateStatus?.status === 'available' && (
                   <button
-                    onClick={() => { onDownloadUpdate?.(); setShowDropdown(false); }}
+                    onClick={() => onDownloadUpdate?.()}
                     className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
                   >
                     Download & Install
@@ -118,7 +118,7 @@ const TitleBar  = ({
                 )}
                 {updateStatus?.status === 'downloaded' && (
                   <button
-                    onClick={() => { onInstallUpdate?.(); setShowDropdown(false); }}
+                    onClick={() => onInstallUpdate?.()}
                     className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     Restart to Update
@@ -128,7 +128,7 @@ const TitleBar  = ({
             ) : (
               <div className="border-t border-white/[0.04] px-4 py-2">
                 <button
-                  onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
+                  onClick={() => onCheckUpdate?.()}
                   className="w-full text-[10px] text-white/25 hover:text-white/50 transition-colors"
                 >
                   Check for updates
@@ -139,7 +139,7 @@ const TitleBar  = ({
             {(hasUpdate || isDownloading) && (
               <div className="border-t border-white/[0.04] px-4 py-2">
                 <button
-                  onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
+                  onClick={() => onCheckUpdate?.()}
                   className="w-full text-[10px] text-white/25 hover:text-white/50 transition-colors"
                 >
                   Check again
