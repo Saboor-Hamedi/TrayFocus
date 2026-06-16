@@ -60,6 +60,25 @@ function App() {
   // Sync active page to localStorage (instant) and settings (persistent)
   useEffect(() => { try { localStorage.setItem('trayfocus-page', activePage); } catch {}; settings.save({ activePage }); }, [activePage]);
 
+  // Currently active theme ID — loaded from settings.json on mount
+  const [activeTheme, setActiveTheme] = useState('zinc');
+
+  // Persistent settings loaded from settings.json
+  const [settingsValues, setSettingsValues] = useState({});
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+
+  useEffect(() => {
+    settings.load().then((data) => {
+      setActiveTheme(data.theme || 'zinc');
+      setActivePage(data.activePage || 'chat');
+      setSettingsValues(data);
+      setAlwaysOnTop(data.alwaysOnTop || false);
+      if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
+      setSettingsLoaded(true);
+    });
+  }, []);
+
   // Listen for update events from main process
   useEffect(() => {
     try {
