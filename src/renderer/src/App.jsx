@@ -122,6 +122,10 @@ function App() {
     setIsCheatsheetOpen((prev) => !prev);
   }, []);
 
+  const toggleSpotlight = useCallback(() => {
+    setIsSpotlightOpen((prev) => !prev);
+  }, []);
+
   // Toggle the sidebar — used by the Ctrl+B shortcut
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
@@ -152,6 +156,15 @@ function App() {
       shortcut: 'Ctrl+/',
       keywords: ['hotkeys', 'help', 'reference'],
       action: () => setIsCheatsheetOpen((prev) => !prev),
+    },
+    {
+      id: 'spotlight',
+      name: 'Spotlight Search',
+      icon: '🔍',
+      description: 'Search anything — commands, themes, settings, shortcuts',
+      shortcut: 'Ctrl+Space',
+      keywords: ['find', 'search', 'global'],
+      action: () => setIsSpotlightOpen(true),
     },
     {
       id: 'update',
@@ -256,6 +269,13 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+Space opens spotlight search
+    const unregisterSpotlight = register(' ', toggleSpotlight, {
+      ctrl: true,
+      description: 'Spotlight search',
+      priority: 10,
+    });
+
     return () => {
       unregisterTheme();
       unregisterPalette();
@@ -263,9 +283,10 @@ function App() {
       unregisterSettings();
       unregisterPin();
       unregisterCheatsheet();
+      unregisterSpotlight();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet, toggleSpotlight]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -433,6 +454,26 @@ function App() {
       <ShortcutCheatsheet
         isOpen={isCheatsheetOpen}
         onClose={() => setIsCheatsheetOpen(false)}
+      />
+
+      <SpotlightSearch
+        isOpen={isSpotlightOpen}
+        onClose={() => setIsSpotlightOpen(false)}
+        commands={commands}
+        settings={[
+          { key: 'autostart', label: 'Launch at startup', description: 'Start TrayFocus when you log in' },
+          { key: 'minimizeToTray', label: 'Minimize to tray', description: 'Hide to system tray instead of closing' },
+          { key: 'showMaximize', label: 'Show maximize button', description: 'Show the maximize/restore button on the title bar' },
+          { key: 'alwaysOnTop', label: 'Always on top', description: 'Keep TrayFocus above other windows' },
+          { key: 'displayName', label: 'Display name', description: 'Your display name in the app' },
+          { key: 'fontSize', label: 'Font size', description: 'Adjust the app text size (px)' },
+          { key: 'compactMode', label: 'Compact mode', description: 'Reduce spacing for a denser layout' },
+          { key: 'animationsEnabled', label: 'Animations', description: 'Enable UI transition animations' },
+          { key: 'checkUpdates', label: 'Auto-check updates', description: 'Check for new versions on launch' },
+          { key: 'debugMode', label: 'Debug mode', description: 'Show debug information in console' },
+        ]}
+        onOpenTheme={(id) => { setActiveTheme(id); settings.saveTheme(id); }}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
       />
     </div>
   );
