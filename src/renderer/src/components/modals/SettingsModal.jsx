@@ -28,6 +28,7 @@ export const SettingsModal = ({
   onReset,
   initialValues = {},
   title = "Settings",
+  theme = 'dark', // string 'dark'|'light' OR a style object
   width = 'w-[680px]',
   height = 'h-[500px]',
   showSearch = true,
@@ -235,7 +236,11 @@ export const SettingsModal = ({
     }
   };
 
-  const style = themes.dark;
+  const resolveTheme = (t) => {
+    if (typeof t === 'object' && t !== null) return { ...themes.dark, ...t };
+    return themes[t] || themes.dark;
+  };
+  const style = resolveTheme(theme);
 
   return (
     <SettingsContext.Provider value={{ values, handleChange, errors, style }}>

@@ -8,7 +8,7 @@ import ShortcutsPanel from './components/settings/ShortcutsPanel';
 import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
-import { getTheme, getThemeClass } from './theme';
+import { getTheme, getThemeClass, getAccentClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
 import * as settings from './utils/settingsManager';
 import pkg from '../../../package.json';
@@ -215,21 +215,35 @@ function App() {
 
   // className string for the root wrapper div (background + text color)
   const themeClass = getThemeClass(activeTheme);
+  const accentClass = useMemo(() => getAccentClass(activeTheme), [activeTheme]);
 
-  // Sidebar style derived from active theme — uses neutral white-opacity
-  // classes that work with any background, plus the theme's text color
+  const settingsStyle = useMemo(() => ({
+    bg: theme.bg,
+    border: 'border-white/10',
+    text: theme.text,
+    textMuted: 'text-white/40',
+    hover: 'hover:bg-white/5',
+    active: `${accentClass} bg-white/10`,
+    toggle: accentClass,
+    input: 'bg-white/5 border-white/10 text-white',
+    inputFocus: 'border-white/20',
+    scrollbar: 'scrollbar-thumb-zinc-700',
+    shadow: 'shadow-2xl',
+  }), [theme, accentClass]);
+
   const sidebarStyle = useMemo(() => ({
     bg: theme.bg,
     border: 'border-white/10',
     text: theme.text,
     textMuted: 'text-white/40',
     hover: 'hover:bg-white/5',
-    active: 'bg-white/10 text-white',
+    active: `${accentClass} bg-white/10`,
+    toggle: accentClass,
     activeBg: 'bg-white/5',
     divider: 'border-white/10',
     scrollbar: 'scrollbar-thumb-zinc-700',
     shadow: 'shadow-2xl',
-  }), [theme]);
+  }), [theme, accentClass]);
 
   return (
     // root wrapper — fills the entire Electron window, flex column layout
@@ -263,7 +277,7 @@ function App() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         position="left"
-        width="w-64"
+        width="w-56"
         collapsible={false}
         theme={sidebarStyle}
       >
@@ -325,6 +339,7 @@ function App() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         initialValues={settingsValues}
+        theme={settingsStyle}
         title="Settings"
         settings={[
           { key: 'autostart', category: 'general', label: 'Launch at startup', description: 'Start TrayFocus when you log in', type: 'switch', defaultValue: false },

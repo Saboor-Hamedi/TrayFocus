@@ -66,7 +66,7 @@ const SettingsItem = ({ setting }) => {
         return (
           <button
             onClick={() => handleChange(setting.key, !value)}
-            className={`relative w-9 h-5 rounded-full transition-colors ${value ? 'bg-blue-500' : 'bg-zinc-700'}`}
+            className={`relative w-9 h-5 rounded-full transition-colors ${value ? style.toggle : 'bg-zinc-700'}`}
           >
             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </button>
