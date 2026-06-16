@@ -45,7 +45,7 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
           placeholder={disabled && !loading ? 'Set API key in Settings → AI' : placeholder}
           disabled={disabled && !loading}
           rows={1}
-          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1 pr-8 text-[11px] text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text max-h-[32px] overflow-y-auto"
+          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1.5 pr-8 text-xs text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text"
           spellCheck={false}
         />
         <div className="absolute bottom-1.5 right-1.5">
