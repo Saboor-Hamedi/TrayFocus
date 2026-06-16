@@ -7,12 +7,12 @@ import { Eye, Code2 } from 'lucide-react';
 import Markdown from './Markdown';
 
 const editorTheme = (fs) => EditorView.theme({
-  '&': { fontSize: `${Math.max(fs * 0.85, 11)}px`, height: '100%', background: 'transparent' },
-  '.cm-content': { padding: '12px', fontFamily: 'ui-monospace, monospace', caretColor: '#60a5fa' },
-  '.cm-activeLine': { background: 'rgba(255,255,255,0.03)' },
-  '.cm-selectionBackground': { background: 'rgba(96,165,250,0.2)' },
-  '.cm-gutters': { background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.15)', fontSize: '10px' },
-  '.cm-activeLineGutter': { background: 'transparent', color: 'rgba(255,255,255,0.3)' },
+  '&': { fontSize: `${Math.max(fs * 0.95, 12)}px`, height: '100%', background: 'transparent' },
+  '.cm-content': { padding: '14px', fontFamily: 'ui-monospace, SF Mono, Menlo, Monaco, monospace', caretColor: '#60a5fa', lineHeight: '1.6' },
+  '.cm-activeLine': { background: 'rgba(255,255,255,0.04)' },
+  '.cm-selectionBackground': { background: 'rgba(96,165,250,0.25)' },
+  '.cm-gutters': { background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.12)', fontSize: `${Math.max(fs * 0.7, 9)}px` },
+  '.cm-activeLineGutter': { background: 'transparent', color: 'rgba(255,255,255,0.25)' },
   '.cm-cursor': { borderLeftColor: '#60a5fa' },
   '.cm-focused': { outline: 'none' },
   '.cm-scroller': { overflow: 'auto', scrollbarWidth: 'thin' },

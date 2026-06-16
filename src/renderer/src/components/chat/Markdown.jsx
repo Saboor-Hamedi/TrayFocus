@@ -97,9 +97,11 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
         '[&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3 ' +
         '[&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1.5 [&_h3]:mt-2.5 ' +
         '[&_blockquote]:border-l-2 [&_blockquote]:border-white/10 [&_blockquote]:pl-3 [&_blockquote]:text-white/50 [&_blockquote]:my-2 ' +
-        '[&_table]:w-full [&_table]:text-left [&_table]:my-2 ' +
-        '[&_th]:border-b [&_th]:border-white/10 [&_th]:px-2 [&_th]:py-1 [&_th]:text-[10px] [&_th]:text-white/40 ' +
-        '[&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-2 [&_td]:py-1 ' +
+        '[&_table]:w-full [&_table]:text-left [&_table]:my-2 [&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-lg [&_table]:overflow-hidden [&_table]:border [&_table]:border-white/[0.06] ' +
+        '[&_th]:bg-white/[0.03] [&_th]:border-b [&_th]:border-white/[0.06] [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-[10px] [&_th]:text-white/50 [&_th]:font-medium [&_th]:text-left ' +
+        '[&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-3 [&_td]:py-1.5 [&_td]:text-[11px] ' +
+        '[&_tbody_tr:nth-child(even)_td]:bg-white/[0.01] ' +
+        '[&_tr:last-child_td]:border-b-0 ' +
         '[&_hr]:border-white/[0.06] [&_hr]:my-3'
       }
       style={{ fontSize: fs + 'px' }}
