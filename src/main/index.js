@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import * as fs from 'fs'
 
 const settingsPath = () => {
-  const dir = join(app.getPath('userData'), 'trayfocus')
+  const dir = app.getPath('userData')
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
   return join(dir, 'settings.json')
 }
