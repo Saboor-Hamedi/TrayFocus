@@ -66,6 +66,13 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
       el.style.fontWeight = '500';
     });
 
+    // Apply accent to horizontal rules
+    const hrs = ref.current.querySelectorAll('hr');
+    hrs.forEach((el) => {
+      el.style.borderColor = accentValue + '30';
+      el.style.margin = '12px 0';
+    });
+
     return () => handlers.forEach(([b, h]) => b.removeEventListener('click', h));
   }, [html, accentColor]);
 
