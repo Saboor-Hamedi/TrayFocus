@@ -18,7 +18,7 @@ const editorTheme = EditorView.theme({
   '.cm-scroller': { overflow: 'auto', scrollbarWidth: 'thin' },
 }, { dark: true });
 
-const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14 }) => {
+const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14, accentColor = '' }) => {
   const editorRef = useRef(null);
   const viewRef = useRef(null);
   const [preview, setPreview] = useState(true);
@@ -79,7 +79,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14 
         <div ref={editorRef} className={`${preview ? 'w-1/2 border-r border-white/[0.06]' : 'w-full'} overflow-hidden`} />
         {preview && (
           <div className="w-1/2 overflow-y-auto p-3 bg-white/[0.01]">
-            <Markdown content={content || 'Nothing to preview'} fontSize={fontSize} />
+            <Markdown content={content || 'Nothing to preview'} fontSize={fontSize} accentColor={accentColor} />
           </div>
         )}
       </div>

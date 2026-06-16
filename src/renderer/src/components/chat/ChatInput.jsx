@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Square } from 'lucide-react';
 import Markdown from './Markdown';
 
-const ChatMessage = ({ message, fontSize = 14 }) => {
+const ChatMessage = ({ message, fontSize = 14, accentColor = '' }) => {
   const isUser = message.role === 'user';
   const fs = `${Math.max(fontSize * 0.75, 11)}px`;
   return (
@@ -14,7 +14,7 @@ const ChatMessage = ({ message, fontSize = 14 }) => {
             ? 'bg-red-500/10 text-red-400 rounded-tl-sm'
             : 'bg-white/[0.04] text-white/80 rounded-tl-sm'
       }`} style={{ fontSize: fs }}>
-        {isUser ? message.content : <Markdown content={message.content} fontSize={fontSize} />}
+        {isUser ? message.content : <Markdown content={message.content} fontSize={fontSize} accentColor={accentColor} />}
       </div>
     </div>
   );

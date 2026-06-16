@@ -356,9 +356,10 @@ function App() {
           providerId={settingsValues.aiProvider || 'deepseek'}
           model={settingsValues.aiModel || 'deepseek-chat'}
           fontSize={settingsValues.fontSize || 14}
+          accentColor={accentClass}
         />
       ) : activePage === 'markdown' ? (
-        <MarkdownEditor fontSize={settingsValues.fontSize || 14} />
+        <MarkdownEditor fontSize={settingsValues.fontSize || 14} accentColor={accentClass} />
       ) : (
       <main className="flex-1" />
       )}

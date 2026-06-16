@@ -21,8 +21,12 @@ renderer.code = ({ text, lang }) => {
   return `<div class="cb-wrap"><div class="cb-head"><span>${label}</span><button class="cb-btn" data-code="${encodeURIComponent(text)}">Copy</button></div><pre><code class="hljs${lang ? ` language-${lang}` : ''}">${highlighted}</code></pre></div>`;
 };
 
-const Markdown = ({ content, fontSize = 14 }) => {
+const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
   const ref = useRef(null);
+
+  // Derive a subtle background from the accent text color (text-blue-400 -> bg-blue-400/10)
+  const accentBg = accentColor.replace(/^text-/, 'bg-').replace(/-(\d+)$/, '-$1/10') || 'bg-blue-400/10';
+  const accentText = accentColor || 'text-blue-400';
 
   const html = useMemo(() => {
     try { return marked.parse(content, { async: false, renderer }); }
@@ -53,34 +57,35 @@ const Markdown = ({ content, fontSize = 14 }) => {
   return (
     <div
       ref={ref}
-      className="prose prose-invert max-w-none font-sans leading-relaxed break-words
-        [&_.cb-wrap]:my-2 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.06]
-        [&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-1 [&_.cb-head]:bg-white/[0.03] [&_.cb-head]:border-b [&_.cb-head]:border-white/[0.04] [&_.cb-head]:text-[10px] [&_.cb-head]:text-white/30 [&_.cb-head]:font-mono
-        [&_.cb-btn]:text-[10px] [&_.cb-btn]:text-white/25 [&_.cb-btn]:hover:text-white/50 [&_.cb-btn]:bg-transparent [&_.cb-btn]:border-0 [&_.cb-btn]:cursor-pointer [&_.cb-btn]:transition-colors [&_.cb-btn]:font-sans [&_.cb-btn]:outline-none
-        [&_.cb-wrap_pre]:m-0 [&_.cb-wrap_pre]:bg-black/30 [&_.cb-wrap_pre]:p-3 [&_.cb-wrap_pre]:overflow-x-auto [&_.cb-wrap_pre]:rounded-none
-        [&_.cb-wrap_code]:text-[11px] [&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed
-        [&_pre_code]:text-inherit [&_pre_code]:bg-transparent [&_pre_code]:p-0
-        [&_code]:bg-white/[0.06] [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[11px] [&_code]:font-mono
-        [&_p]:my-1.5
-        [&_a]:text-blue-400 [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-blue-300 [&_a]:transition-colors
-        [&_hr]:border-white/[0.06] [&_hr]:my-3
-        [&_ul]:list-disc [&_ul]:my-1.5 [&_ul]:pl-5
-        [&_ol]:list-decimal [&_ol]:my-1.5 [&_ol]:pl-5
-        [&_li]:my-0.5 [&_li]:pl-1
-        [&_strong]:font-semibold [&_strong]:text-white/90
-        [&_em]:italic [&_em]:text-white/70
-        [&_del]:line-through [&_del]:text-white/40
-        [&_img]:rounded-lg [&_img]:my-2 [&_img]:max-w-full
-        [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h1]:mt-4
-        [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3
-        [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1.5 [&_h3]:mt-2.5
-        [&_blockquote]:border-l-2 [&_blockquote]:border-white/10 [&_blockquote]:pl-3 [&_blockquote]:text-white/50 [&_blockquote]:my-2
-        [&_table]:w-full [&_table]:text-left [&_table]:my-2
-        [&_th]:border-b [&_th]:border-white/10 [&_th]:px-2 [&_th]:py-1 [&_th]:text-[10px] [&_th]:text-white/40
-        [&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-2 [&_td]:py-1
-        [&_hr]:border-white/[0.06] [&_hr]:my-3
-      "
-      style={{ fontSize: `${fs}px` }}
+      className={
+        'prose prose-invert max-w-none font-sans leading-relaxed break-words ' +
+        '[&_.cb-wrap]:my-2 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.06] [&_.cb-wrap]:bg-black/30 ' +
+        '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-1 [&_.cb-head]:border-b [&_.cb-head]:border-white/[0.04] [&_.cb-head]:text-[10px] [&_.cb-head]:text-white/25 [&_.cb-head]:font-mono ' +
+        '[&_.cb-btn]:text-[10px] [&_.cb-btn]:text-white/25 [&_.cb-btn]:hover:text-white/50 [&_.cb-btn]:bg-transparent [&_.cb-btn]:border-0 [&_.cb-btn]:cursor-pointer [&_.cb-btn]:transition-colors [&_.cb-btn]:font-sans [&_.cb-btn]:outline-none [&_.cb-btn]:p-0 ' +
+        '[&_.cb-wrap_pre]:m-0 [&_.cb-wrap_pre]:bg-transparent [&_.cb-wrap_pre]:p-3 [&_.cb-wrap_pre]:overflow-x-auto [&_.cb-wrap_pre]:rounded-none ' +
+        '[&_.cb-wrap_code]:text-[11px] [&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed ' +
+        '[&_pre_code]:text-inherit [&_pre_code]:bg-transparent [&_pre_code]:p-0 ' +
+        '[&_code]:' + accentBg + ' [&_code]:' + accentText + ' [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[11px] [&_code]:font-mono ' +
+        '[&_p]:my-1.5 ' +
+        '[&_a]:text-blue-400 [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-blue-300 [&_a]:transition-colors ' +
+        '[&_hr]:border-white/[0.06] [&_hr]:my-3 ' +
+        '[&_ul]:list-disc [&_ul]:my-1.5 [&_ul]:pl-5 ' +
+        '[&_ol]:list-decimal [&_ol]:my-1.5 [&_ol]:pl-5 ' +
+        '[&_li]:my-0.5 [&_li]:pl-1 ' +
+        '[&_strong]:font-semibold [&_strong]:text-white/90 ' +
+        '[&_em]:italic [&_em]:text-white/70 ' +
+        '[&_del]:line-through [&_del]:text-white/40 ' +
+        '[&_img]:rounded-lg [&_img]:my-2 [&_img]:max-w-full ' +
+        '[&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h1]:mt-4 ' +
+        '[&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3 ' +
+        '[&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1.5 [&_h3]:mt-2.5 ' +
+        '[&_blockquote]:border-l-2 [&_blockquote]:border-white/10 [&_blockquote]:pl-3 [&_blockquote]:text-white/50 [&_blockquote]:my-2 ' +
+        '[&_table]:w-full [&_table]:text-left [&_table]:my-2 ' +
+        '[&_th]:border-b [&_th]:border-white/10 [&_th]:px-2 [&_th]:py-1 [&_th]:text-[10px] [&_th]:text-white/40 ' +
+        '[&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-2 [&_td]:py-1 ' +
+        '[&_hr]:border-white/[0.06] [&_hr]:my-3'
+      }
+      style={{ fontSize: fs + 'px' }}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
