@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { EditorView, keymap, placeholder, lineNumbers } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { languages } from '@codemirror/language';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Eye, Code2 } from 'lucide-react';
 import Markdown from './Markdown';

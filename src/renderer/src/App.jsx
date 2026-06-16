@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key } from 'lucide-react';
+import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -9,6 +9,7 @@ import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import AccentPanel from './components/settings/AccentPanel';
 import ChatPanel from './components/chat/ChatPanel';
+import MarkdownEditor from './components/chat/MarkdownEditor';
 import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
@@ -351,6 +352,8 @@ function App() {
           providerId={settingsValues.aiProvider || 'deepseek'}
           model={settingsValues.aiModel || 'deepseek-chat'}
         />
+      ) : activePage === 'markdown' ? (
+        <MarkdownEditor />
       ) : (
       <main className="flex-1" />
       )}
@@ -385,6 +388,12 @@ function App() {
               label="Home"
               active={activePage === 'home' && !isThemeModalOpen && !isSettingsModalOpen}
               onClick={() => setActivePage('home')}
+            />
+            <SidebarItem
+              icon={<FileText className="w-4 h-4" strokeWidth={1.5} />}
+              label="Markdown"
+              active={activePage === 'markdown'}
+              onClick={() => setActivePage('markdown')}
             />
           </SidebarGroup>
 
