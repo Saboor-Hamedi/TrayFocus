@@ -13,7 +13,7 @@ import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } fro
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
 import * as settings from './utils/settingsManager';
-// import pkg from '../../../package.json';
+import pkg from '../../../package.json';
 
 // ============================================================
 // Root application component

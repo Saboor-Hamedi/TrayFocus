@@ -1,10 +1,16 @@
 import React from 'react';
-import { AlertTriangle, ChevronDown, ChevronRight, Copy, RotateCw } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Copy, RotateCw, X } from 'lucide-react';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, info: null, showStack: false, copied: false };
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      info: null, 
+      showStack: false, 
+      copied: false 
+    };
   }
 
   static getDerivedStateFromError(error) {
@@ -13,7 +19,7 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, info) {
     this.setState({ info });
-    console.error('[TrayFocus] Crash:', error, info?.componentStack);
+    console.error('[App] Crash:', error, info?.componentStack);
   }
 
   copyError = () => {
@@ -32,74 +38,109 @@ export class ErrorBoundary extends React.Component {
     }).catch(() => {});
   };
 
+  handleReset = () => {
+    this.setState({ hasError: false, error: null, info: null, showStack: false });
+    if (this.props.onReset) this.props.onReset();
+  };
+
   render() {
     if (this.state.hasError) {
       const { error, info, showStack, copied } = this.state;
       return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center bg-zinc-950 text-white select-none p-6">
-          <div className="w-full max-w-xl">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center mt-0.5">
-                <AlertTriangle className="w-4 h-4 text-red-400" strokeWidth={2} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150" />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-lg bg-zinc-900/95 border border-zinc-800 rounded-xl shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-red-400" strokeWidth={2} />
+                </div>
+                <div>
+                  <h1 className="text-sm font-semibold text-white">Application Error</h1>
+                  <p className="text-xs text-zinc-400">Something went wrong</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-sm font-semibold text-red-400 mb-1">Application Error</h1>
-                <p className="text-xs text-red-300/80 break-all">{error?.message || 'An unexpected error occurred'}</p>
-              </div>
+              <button
+                onClick={this.handleReset}
+                className="text-zinc-500 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {(error?.stack || info?.componentStack) && (
-              <div className="mb-4">
-                <button
-                  onClick={() => this.setState({ showStack: !showStack })}
-                  className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/50 transition-colors mb-2"
-                >
-                  {showStack ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                  Stack Trace
-                </button>
-                {showStack && (
-                  <div className="rounded-lg bg-zinc-900 border border-zinc-800 overflow-hidden">
-                    <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between">
-                      <span className="text-[10px] text-zinc-500 font-mono">
-                        {error?.name || 'Error'}
-                        {info?.componentStack && ' — in ' + info.componentStack.split('\n')[0]?.trim().replace(/^\s*in\s*/, '')}
-                      </span>
-                      <button onClick={this.copyError} className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/50 transition-colors">
-                        <Copy className="w-3 h-3" />
-                        {copied ? 'Copied' : 'Copy'}
-                      </button>
-                    </div>
-                    <pre className="p-3 text-[10px] leading-relaxed text-red-300/70 font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap break-all">
-                      {error?.stack || 'No stack trace'}
-                      {info?.componentStack && (
-                        <>
-                          {'\n\nComponent stack:'}
-                          {info.componentStack}
-                        </>
-                      )}
-                    </pre>
-                  </div>
-                )}
+            {/* Content */}
+            <div className="p-6">
+              {/* Error Message */}
+              <div className="mb-4 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                <p className="text-sm text-red-400 font-medium">
+                  {error?.message || 'An unexpected error occurred'}
+                </p>
               </div>
-            )}
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  this.setState({ hasError: false, error: null, info: null, showStack: false });
-                  if (this.props.onReset) this.props.onReset();
-                }}
-                className="px-4 py-1.5 text-xs font-medium rounded-md bg-white/10 hover:bg-white/20 text-white/80 transition-colors"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-1.5 text-xs font-medium rounded-md bg-white/5 hover:bg-white/10 text-white/50 transition-colors flex items-center gap-1.5"
-              >
-                <RotateCw className="w-3 h-3" />
-                Reload App
-              </button>
+              {/* Stack Trace */}
+              {(error?.stack || info?.componentStack) && (
+                <div className="mb-4">
+                  <button
+                    onClick={() => this.setState({ showStack: !showStack })}
+                    className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors mb-2"
+                  >
+                    {showStack ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                    {showStack ? 'Hide' : 'View'} Stack Trace
+                  </button>
+                  
+                  {showStack && (
+                    <div className="rounded-lg bg-zinc-950 border border-zinc-800 overflow-hidden">
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800">
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {error?.name || 'Error'}
+                          {info?.componentStack && (
+                            <span className="ml-2 text-zinc-600">
+                              — {info.componentStack.split('\n')[0]?.trim().replace(/^\s*in\s*/, '')}
+                            </span>
+                          )}
+                        </span>
+                        <button
+                          onClick={this.copyError}
+                          className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-white transition-colors"
+                        >
+                          <Copy className="w-3 h-3" />
+                          {copied ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+                      <pre className="p-3 text-[10px] leading-relaxed text-red-300/70 font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap break-all">
+                        {error?.stack || 'No stack trace'}
+                        {info?.componentStack && (
+                          <>
+                            {'\n\nComponent stack:'}
+                            {info.componentStack}
+                          </>
+                        )}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 pt-2 border-t border-zinc-800">
+                <button
+                  onClick={this.handleReset}
+                  className="px-4 py-1.5 text-xs font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-1.5 text-xs font-medium rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors flex items-center gap-1.5"
+                >
+                  <RotateCw className="w-3 h-3" />
+                  Reload App
+                </button>
+              </div>
             </div>
           </div>
         </div>
