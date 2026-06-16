@@ -363,8 +363,6 @@ function App() {
         width="w-56"
         collapsible={false}
         theme={sidebarStyle}
-        closeOnOverlayClick={false}
-        closeOnEscape={false}
       >
         <SidebarHeader
           title="TrayFocus"

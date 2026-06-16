@@ -16,3 +16,8 @@ export async function sendMessage(providerId, messages, apiKey, options = {}) {
   const provider = getProvider(providerId);
   return provider.chat(messages, apiKey, options);
 }
+
+export async function* streamMessage(providerId, messages, apiKey, options = {}) {
+  const provider = getProvider(providerId);
+  yield* provider.stream(messages, apiKey, options);
+}
