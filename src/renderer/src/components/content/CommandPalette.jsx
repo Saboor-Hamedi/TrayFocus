@@ -8,7 +8,6 @@ const CommandPalette = ({
   onClose,
   commands = [],
   mode = 'commands',
-  settings = [],
   spotlightExtras = {},
   placeholder = "Search commands...",
   emptyMessage = "No commands found",
@@ -69,14 +68,10 @@ const CommandPalette = ({
       all.push(...shortcuts
         .filter(s => s.description.toLowerCase().includes(lower))
         .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
-
-      all.push(...settings
-        .filter(s => (s.label || '').toLowerCase().includes(lower) || (s.description || '').toLowerCase().includes(lower))
-        .map(s => ({ ...s, kind: 'setting', label: s.label, action: () => spotlightExtras.onOpenSettings?.(), score: 2 })));
     }
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
-  }, [isSpotlight, commands, themes, shortcuts, settings, spotlightExtras]);
+  }, [isSpotlight, commands, themes, shortcuts, spotlightExtras]);
 
   const score = (name, keywords = [], q) => {
     const combined = `${name.toLowerCase()} ${keywords.join(' ').toLowerCase()}`;

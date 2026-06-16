@@ -408,12 +408,6 @@ function App() {
         commands={commands}
         mode={paletteMode}
         placeholder={paletteMode === 'spotlight' ? 'Search anything...' : 'Search commands...'}
-        settings={[
-          { key: 'autostart', label: 'Launch at startup', description: 'Start TrayFocus when you log in' },
-          { key: 'minimizeToTray', label: 'Minimize to tray', description: 'Hide to system tray instead of closing' },
-          { key: 'alwaysOnTop', label: 'Always on top', description: 'Keep TrayFocus above other windows' },
-          { key: 'displayName', label: 'Display name', description: 'Your display name in the app' },
-        ]}
         spotlightExtras={{
           onOpenTheme: (id) => { setActiveTheme(id); settings.saveTheme(id); },
           onOpenSettings: () => setIsSettingsModalOpen(true),
