@@ -79,6 +79,10 @@ function App() {
     });
   }, []);
 
+  // Update status (from main process auto-updater)
+  const [updateStatus, setUpdateStatus] = useState(null);
+  const [checking, setChecking] = useState(false);
+
   // Listen for update events from main process
   useEffect(() => {
     try {
