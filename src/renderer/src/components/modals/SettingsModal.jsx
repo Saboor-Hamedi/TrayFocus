@@ -28,8 +28,8 @@ export const SettingsModal = ({
   onReset,
   initialValues = {},
   title = "Settings",
-  width = 'w-[640px]',
-  height = 'h-[440px]',
+  width = 'w-[680px]',
+  height = 'h-[500px]',
   showSearch = true,
   showReset = true,
   showSave = true,
@@ -284,13 +284,13 @@ export const SettingsModal = ({
                   <button
                     key={category.id}
                     onClick={() => setActiveCategory(category.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs transition-all ${
                       activeCategory === category.id
                         ? `${style.active} border-r-2 border-blue-500`
                         : `${style.textMuted} ${style.hover}`
                     }`}
                   >
-                    {category.icon && <span className="text-lg">{category.icon}</span>}
+                    {category.icon && <span className="text-sm">{category.icon}</span>}
                     <span className="font-medium">{category.label}</span>
                   </button>
                 );
@@ -301,15 +301,15 @@ export const SettingsModal = ({
             <div className="flex-1 flex flex-col overflow-hidden">
               {/* Search */}
               {showSearch && (
-                <div className="px-6 pt-4 pb-3 border-b border-zinc-800/50">
+                <div className="px-4 pt-3 pb-2 border-b border-zinc-800/50">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" strokeWidth={2} />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" strokeWidth={2} />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search settings..."
-                      className={`w-full pl-9 pr-4 py-2 text-sm rounded-lg border ${style.input} ${style.inputFocus} outline-none transition-all`}
+                      className={`w-full pl-8 pr-4 py-1.5 text-xs rounded-md border ${style.input} ${style.inputFocus} outline-none transition-all`}
                     />
                   </div>
                 </div>
@@ -317,11 +317,11 @@ export const SettingsModal = ({
 
               {/* Settings List or Custom Section */}
               {customSections[activeCategory] ? (
-                <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="flex-1 overflow-y-auto px-4 py-3">
                   {customSections[activeCategory]}
                 </div>
               ) : (
-              <div className={`flex-1 overflow-y-auto px-6 py-4 ${style.scrollbar}`}>
+              <div className={`flex-1 overflow-y-auto px-4 py-3 ${style.scrollbar}`}>
                 {groupedSettings.filter(g => searchQuery ? true : g.id === activeCategory).length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-zinc-500">
                     <p className="text-sm">No settings found</p>
