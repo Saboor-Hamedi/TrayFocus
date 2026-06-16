@@ -24,19 +24,17 @@ renderer.code = ({ text, lang }) => {
 const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
   const ref = useRef(null);
 
-  // Derive a subtle background from the accent text color (text-blue-400 -> bg-blue-400/10)
-  const accentBg = accentColor.replace(/^text-/, 'bg-').replace(/-(\d+)$/, '-$1/10') || 'bg-blue-400/10';
-  const accentText = accentColor || 'text-blue-400';
-
   const html = useMemo(() => {
     try { return marked.parse(content, { async: false, renderer }); }
     catch { return content; }
   }, [content]);
 
-  // Attach copy handlers to code block buttons after each render
+  // Attach copy handlers + accent styles after render
   useEffect(() => {
     if (!ref.current) return;
     const handlers = [];
+
+    // Copy buttons
     const btns = ref.current.querySelectorAll('.cb-btn');
     btns.forEach((btn) => {
       const handler = () => {
@@ -49,15 +47,26 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
       btn.addEventListener('click', handler);
       handlers.push([btn, handler]);
     });
+
+    // Apply accent color to inline code (not code blocks)
+    if (accentColor) {
+      const color = getComputedStyle(ref.current).color; // from the accent text class on parent
+      const inlineCodes = ref.current.querySelectorAll(':not(pre) > code');
+      inlineCodes.forEach((el) => {
+        el.style.color = color;
+        el.style.background = color.replace(')', ', 0.1)').replace('rgb(', 'rgba(');
+      });
+    }
+
     return () => handlers.forEach(([b, h]) => b.removeEventListener('click', h));
-  }, [html]);
+  }, [html, accentColor]);
 
   const fs = Math.max(fontSize * 0.75, 11);
 
   return (
     <div
       ref={ref}
-      className={
+      className={accentColor + ' ' +
         'prose prose-invert max-w-none font-sans leading-relaxed break-words ' +
         '[&_.cb-wrap]:my-2 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.06] [&_.cb-wrap]:bg-black/30 ' +
         '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-1 [&_.cb-head]:border-b [&_.cb-head]:border-white/[0.04] [&_.cb-head]:text-[10px] [&_.cb-head]:text-white/25 [&_.cb-head]:font-mono ' +
@@ -65,7 +74,7 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
         '[&_.cb-wrap_pre]:m-0 [&_.cb-wrap_pre]:bg-transparent [&_.cb-wrap_pre]:p-3 [&_.cb-wrap_pre]:overflow-x-auto [&_.cb-wrap_pre]:rounded-none ' +
         '[&_.cb-wrap_code]:text-[11px] [&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed ' +
         '[&_pre_code]:text-inherit [&_pre_code]:bg-transparent [&_pre_code]:p-0 ' +
-        '[&_code]:' + accentBg + ' [&_code]:' + accentText + ' [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[11px] [&_code]:font-mono ' +
+        '[&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[11px] [&_code]:font-mono ' +
         '[&_p]:my-1.5 ' +
         '[&_a]:text-blue-400 [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-blue-300 [&_a]:transition-colors ' +
         '[&_hr]:border-white/[0.06] [&_hr]:my-3 ' +
