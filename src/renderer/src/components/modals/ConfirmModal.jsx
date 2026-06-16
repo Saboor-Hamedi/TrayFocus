@@ -28,41 +28,43 @@ const ConfirmModal = ({
 
   if (!isOpen) return null;
 
-  const v = {
-    danger:  { color: 'text-red-400', bg: 'bg-red-500/10', btn: 'bg-red-500 hover:bg-red-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
-    primary: { color: 'text-blue-400', bg: 'bg-blue-500/10', btn: 'bg-blue-500 hover:bg-blue-600', icon: <Info className="w-4 h-4" strokeWidth={2} /> },
-    success: { color: 'text-green-400', bg: 'bg-green-500/10', btn: 'bg-green-500 hover:bg-green-600', icon: <CheckCircle className="w-4 h-4" strokeWidth={2} /> },
-    warning: { color: 'text-yellow-400', bg: 'bg-yellow-500/10', btn: 'bg-yellow-500 hover:bg-yellow-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
+  const variants = {
+    danger:  { text: 'text-red-400', btn: 'bg-red-500 hover:bg-red-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
+    primary: { text: 'text-blue-400', btn: 'bg-blue-500 hover:bg-blue-600', icon: <Info className="w-4 h-4" strokeWidth={2} /> },
+    success: { text: 'text-green-400', btn: 'bg-green-500 hover:bg-green-600', icon: <CheckCircle className="w-4 h-4" strokeWidth={2} /> },
+    warning: { text: 'text-yellow-400', btn: 'bg-yellow-500 hover:bg-yellow-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
   };
-  const s = v[confirmVariant] || v.danger;
+  const v = variants[confirmVariant] || variants.danger;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-xs bg-zinc-900/95 border border-white/10 rounded-xl shadow-2xl">
-        <div className="p-5 text-center">
-          <div className={`inline-flex items-center justify-center w-9 h-9 rounded-full ${s.bg} ${s.color} mb-3`}>
-            {s.icon}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-[320px] bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
+        <div className="p-5">
+          <div className="flex items-start gap-3">
+            <span className={`flex-shrink-0 mt-0.5 ${v.text}`}>{v.icon}</span>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-white">{title}</h3>
+              <p className="mt-1 text-xs text-zinc-400 leading-relaxed">{message}</p>
+            </div>
           </div>
-          <h3 className={`text-sm font-semibold ${s.color}`}>{title}</h3>
-          <p className="mt-1 text-xs text-white/40">{message}</p>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="px-3 py-1.5 text-[11px] font-medium text-white/30 hover:text-white/50 transition-colors disabled:opacity-30"
-            >
-              {cancelText}
-            </button>
-            <button
-              ref={confirmRef}
-              onClick={onConfirm}
-              disabled={loading}
-              className={`px-3 py-1.5 text-[11px] font-medium text-white rounded-md transition-all ${s.btn} disabled:opacity-50`}
-            >
-              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : confirmText}
-            </button>
-          </div>
+        </div>
+        <div className="flex justify-end gap-2 px-4 py-3 border-t border-zinc-800 bg-zinc-900/50">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-40"
+          >
+            {cancelText}
+          </button>
+          <button
+            ref={confirmRef}
+            onClick={onConfirm}
+            disabled={loading}
+            className={`px-4 py-1.5 text-xs font-medium text-white rounded-md transition-all ${v.btn} disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : confirmText}
+          </button>
         </div>
       </div>
     </div>
