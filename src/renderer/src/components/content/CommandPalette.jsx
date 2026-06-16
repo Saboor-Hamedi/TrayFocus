@@ -99,6 +99,13 @@ const CommandPalette = ({
   useEffect(() => {
     if (!isOpen) return;
     const h = (e) => {
+      // Toggle spotlight with Ctrl+Shift+P while palette is open
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        setInternalMode(isSpotlight ? 'commands' : 'spotlight');
+        setSearch('');
+        return;
+      }
       if (e.key === 'Escape') { e.preventDefault(); onClose(); }
       if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedIndex(p => Math.min(p + 1, results.length - 1)); }
       if (e.key === 'ArrowUp') { e.preventDefault(); setSelectedIndex(p => Math.max(p - 1, 0)); }
@@ -146,7 +153,7 @@ const CommandPalette = ({
       <div className={`relative w-full max-w-lg ${className}`}>
         <div className={`rounded-xl border ${style.border} ${style.bg} shadow-2xl backdrop-blur-xl overflow-hidden`}>
           <div className="relative">
-            <div className="absolute inset-y-0 left-3 flex items-center gap-1 pointer-events-none">
+            <div className="absolute inset-y-0 left-4 flex items-center gap-1 pointer-events-none">
               {isSpotlight && <ChevronRight className="w-3.5 h-3.5 text-white/20" strokeWidth={2} />}
               <Search className="w-4 h-4 text-white/30" strokeWidth={1.5} />
             </div>
@@ -156,7 +163,7 @@ const CommandPalette = ({
               value={search}
               onChange={(e) => handleChange(e.target.value)}
               placeholder={isSpotlight ? 'Search anything...' : placeholder}
-              className={`w-full pl-10 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
+              className={`w-full pl-12 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
               spellCheck={false}
               autoComplete="off"
             />
