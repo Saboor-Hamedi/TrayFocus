@@ -9,7 +9,7 @@ import Markdown from './Markdown';
 const STORAGE_KEY = 'trayfocus-md-preview';
 const STORAGE_SPLIT = 'trayfocus-md-split';
 
-const loadPreview = () => { try { return localStorage.getItem(STORAGE_KEY) !== 'false' } catch { return false } };
+const loadPreview = () => { try { return localStorage.getItem(STORAGE_KEY) === 'true' } catch { return false } };
 const savePreview = (v) => { try { localStorage.setItem(STORAGE_KEY, v) } catch {} };
 const loadSplit = () => { try { const v = parseFloat(localStorage.getItem(STORAGE_SPLIT)); return v > 0.1 && v < 0.9 ? v : 0.5 } catch { return 0.5 } };
 const saveSplit = (v) => { try { localStorage.setItem(STORAGE_SPLIT, v) } catch {} };
@@ -82,12 +82,6 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
         markdown({ base: markdownLanguage }),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         history(),
-        EditorView.domEventHandlers({
-          keydown: (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); togglePreview(); return true; }
-            return false;
-          },
-        }),
         placeholder('Write markdown...'),
         editorTheme(fontSize),
         update,
@@ -97,6 +91,17 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
 
     return () => { viewRef.current?.destroy(); viewRef.current = null; };
   }, []);
+
+  // Attach Ctrl+\ shortcut to the editor DOM element
+  useEffect(() => {
+    if (!viewRef.current) return;
+    const el = viewRef.current.dom;
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); togglePreview(); }
+    };
+    el.addEventListener('keydown', handler);
+    return () => el.removeEventListener('keydown', handler);
+  }, [togglePreview]);
 
   useEffect(() => {
     if (!viewRef.current) return;
