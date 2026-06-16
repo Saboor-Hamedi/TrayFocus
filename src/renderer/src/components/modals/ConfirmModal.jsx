@@ -6,107 +6,51 @@ const ConfirmModal = ({
   onClose,
   onConfirm,
   title = "Confirm",
-  message = "Are you sure you want to proceed?",
+  message = "Are you sure?",
   confirmText = "Confirm",
   cancelText = "Cancel",
-  confirmVariant = "danger", // 'danger' | 'primary' | 'success' | 'warning'
-  icon = null,
-  size = "sm", // 'sm' | 'md' | 'lg'
-  closeOnOverlayClick = true,
-  closeOnEscape = true,
+  confirmVariant = "danger",
   loading = false,
-  destructive = false,
-  className = ""
+  closeOnEscape = true,
 }) => {
   const confirmRef = useRef(null);
 
-  // Focus confirm button on open
   useEffect(() => {
-    if (isOpen && confirmRef.current) {
-      setTimeout(() => confirmRef.current.focus(), 100);
-    }
+    if (isOpen && confirmRef.current) setTimeout(() => confirmRef.current.focus(), 100);
   }, [isOpen]);
 
-  // Handle escape key
   useEffect(() => {
     if (!isOpen || !closeOnEscape) return;
-
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    const h = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
   }, [isOpen, closeOnEscape, onClose]);
 
   if (!isOpen) return null;
 
-  // Size classes
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg'
+  const v = {
+    danger:  { color: 'text-red-400', bg: 'bg-red-500/10', btn: 'bg-red-500 hover:bg-red-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
+    primary: { color: 'text-blue-400', bg: 'bg-blue-500/10', btn: 'bg-blue-500 hover:bg-blue-600', icon: <Info className="w-4 h-4" strokeWidth={2} /> },
+    success: { color: 'text-green-400', bg: 'bg-green-500/10', btn: 'bg-green-500 hover:bg-green-600', icon: <CheckCircle className="w-4 h-4" strokeWidth={2} /> },
+    warning: { color: 'text-yellow-400', bg: 'bg-yellow-500/10', btn: 'bg-yellow-500 hover:bg-yellow-600', icon: <AlertTriangle className="w-4 h-4" strokeWidth={2} /> },
   };
-
-  // Variant styles
-  const variantStyles = {
-    danger: 'bg-red-500 hover:bg-red-600 focus:ring-red-500',
-    primary: 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500',
-    success: 'bg-green-500 hover:bg-green-600 focus:ring-green-500',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500'
-  };
-
-  // Icon mapping
-  const defaultIcons = {
-    danger:  <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500"><AlertTriangle className="w-5 h-5" strokeWidth={2} /></div>,
-    primary: <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500"><Info className="w-5 h-5" strokeWidth={2} /></div>,
-    success: <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500"><CheckCircle className="w-5 h-5" strokeWidth={2} /></div>,
-    warning: <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500"><AlertTriangle className="w-5 h-5" strokeWidth={2} /></div>,
-  };
-
-  const variantColor = {
-    danger: 'text-red-500',
-    primary: 'text-blue-500',
-    success: 'text-green-500',
-    warning: 'text-yellow-500'
-  };
+  const s = v[confirmVariant] || v.danger;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
-        onClick={closeOnOverlayClick ? onClose : undefined}
-      />
-
-      {/* Modal */}
-      <div className={`relative ${sizeClasses[size]} w-full bg-zinc-900/95 border border-zinc-800 rounded-xl shadow-2xl animate-in zoom-in-95 duration-200 ${className}`}>
-        <div className="p-6">
-          {/* Icon */}
-          {(icon || defaultIcons[confirmVariant]) && (
-            <div className="flex justify-center mb-4">
-              {icon || defaultIcons[confirmVariant]}
-            </div>
-          )}
-
-          {/* Title */}
-          <h3 className={`text-lg font-semibold text-center ${variantColor[confirmVariant] || 'text-white'}`}>
-            {title}
-          </h3>
-
-          {/* Message */}
-          <p className="mt-2 text-sm text-zinc-400 text-center">
-            {message}
-          </p>
-
-          {/* Actions */}
-          <div className="flex items-center justify-center gap-3 mt-6">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xs bg-zinc-900/95 border border-white/10 rounded-xl shadow-2xl">
+        <div className="p-5 text-center">
+          <div className={`inline-flex items-center justify-center w-9 h-9 rounded-full ${s.bg} ${s.color} mb-3`}>
+            {s.icon}
+          </div>
+          <h3 className={`text-sm font-semibold ${s.color}`}>{title}</h3>
+          <p className="mt-1 text-xs text-white/40">{message}</p>
+          <div className="flex items-center justify-center gap-2 mt-4">
             <button
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-[11px] font-medium text-white/30 hover:text-white/50 transition-colors disabled:opacity-30"
             >
               {cancelText}
             </button>
@@ -114,20 +58,9 @@ const ConfirmModal = ({
               ref={confirmRef}
               onClick={onConfirm}
               disabled={loading}
-              className={`px-6 py-2 text-sm font-medium text-white rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed ${
-                destructive 
-                  ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' 
-                  : variantStyles[confirmVariant] || variantStyles.primary
-              }`}
+              className={`px-3 py-1.5 text-[11px] font-medium text-white rounded-md transition-all ${s.btn} disabled:opacity-50`}
             >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2} />
-                  Loading...
-                </div>
-              ) : (
-                confirmText
-              )}
+              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : confirmText}
             </button>
           </div>
         </div>

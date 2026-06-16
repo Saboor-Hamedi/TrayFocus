@@ -350,15 +350,15 @@ export const SettingsModal = ({
               )}
 
               {/* Footer Actions */}
-              <div className="flex items-center justify-between px-6 py-3 border-t border-zinc-800/50 bg-zinc-900/30">
-                <div className="text-xs text-zinc-500">
-                  {isDirty && <span className="text-yellow-400">• Unsaved changes</span>}
+              <div className="flex items-center justify-between px-4 py-2 border-t border-white/5">
+                <div className="text-[10px] text-white/20">
+                  {isDirty && <span className="text-yellow-400/60">• Unsaved changes</span>}
                 </div>
                 <div className="flex items-center gap-2">
                   {showReset && (
                     <button
                       onClick={handleReset}
-                      className="px-4 py-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
+                      className="px-3 py-1 text-[11px] font-medium text-white/30 hover:text-white/60 transition-colors rounded-md hover:bg-white/5"
                     >
                       Reset
                     </button>
@@ -367,13 +367,13 @@ export const SettingsModal = ({
                     <button
                       onClick={handleSave}
                       disabled={isSaving || !isDirty}
-                      className={`px-6 py-1.5 text-sm font-medium rounded-lg transition-all ${
+                      className={`px-3 py-1 text-[11px] font-medium rounded-md transition-all ${
                         isSaving || !isDirty
-                          ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                          : 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/25'
+                          ? 'bg-white/5 text-white/15 cursor-not-allowed'
+                          : 'bg-blue-500 text-white hover:bg-blue-600'
                       }`}
                     >
-                      {isSaving ? 'Saving...' : 'Save Changes'}
+                      {isSaving ? 'Saving...' : 'Save'}
                     </button>
                   )}
                 </div>
