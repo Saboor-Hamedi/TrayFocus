@@ -8,8 +8,9 @@ import ShortcutsPanel from './components/settings/ShortcutsPanel';
 import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
-import { loadTheme, saveTheme, getTheme, getThemeClass } from './theme';
+import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
+import * as settings from './utils/settingsManager';
 import pkg from '../../../package.json';
 
 // ============================================================
@@ -18,11 +19,11 @@ import pkg from '../../../package.json';
 // This is the single React root mounted into index.html#root.
 // It owns all top-level state and wires together:
 //   1. The custom title bar (minimize / close window)
-//   2. The theme system (persisted to localStorage)
+//   2. The theme system (persisted to AppData/trayfocus/settings.json)
 //   3. The theme picker modal (Ctrl+T shortcut)
 //   4. The command palette (Ctrl+P shortcut)
 //   5. The sidebar (Ctrl+B toggle)
-//   6. Keyboard shortcut handling (ShortcutManager)
+//   6. Settings (persisted to AppData/trayfocus/settings.json)
 // ============================================================
 
 // Safe IPC send — wraps window.electron.ipcRenderer in a try/catch
@@ -45,14 +46,18 @@ function App() {
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-  // Currently active theme ID — loaded from localStorage on first render
-  const [activeTheme, setActiveTheme] = useState(loadTheme);
+  // Currently active theme ID — loaded from settings.json on mount
+  const [activeTheme, setActiveTheme] = useState('zinc');
+
+  useEffect(() => {
+    settings.loadTheme().then(setActiveTheme);
+  }, []);
 
   // ---- callbacks ----
-  // Select a theme and persist it so it survives app restarts
+  // Select a theme and persist it to settings.json
   const handleSelectTheme = useCallback((id) => {
     setActiveTheme(id);
-    saveTheme(id);
+    settings.saveTheme(id);
   }, []);
 
   // Toggle the theme modal open/closed — used by the Ctrl+T shortcut
@@ -295,7 +300,7 @@ function App() {
           appearance: <AppearancePanel />,
           advanced: <AdvancedPanel />,
         }}
-        onSave={(values) => console.log('settings saved', values)}
+        onSave={(values) => settings.save(values)}
       />
     </div>
   );

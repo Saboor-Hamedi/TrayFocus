@@ -2,6 +2,24 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import fs from 'fs'
+
+const settingsPath = () => {
+  const dir = join(app.getPath('userData'), 'trayfocus')
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  return join(dir, 'settings.json')
+}
+
+const loadSettings = () => {
+  try { return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8')) } catch { return {} }
+}
+
+const saveSettings = (data) => {
+  fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2), 'utf-8')
+}
+
+ipcMain.handle('settings-load', () => loadSettings())
+ipcMain.handle('settings-save', (_e, data) => saveSettings(data))
 
 function createWindow() {
   // Create the browser window.
