@@ -202,7 +202,9 @@ const CommandPalette = ({
           </div>
 
           <div className="flex items-center justify-between px-4 py-1.5 border-t border-white/[0.04]">
-            <span className="text-[9px] text-white/15">{results.length} {isSpotlight ? 'results' : 'commands'}</span>
+            <span className="text-[9px] text-white/15">
+              {results.length > 0 ? `${results.length} ${isSpotlight ? 'results' : 'commands'}` : isSpotlight ? 'Search anything' : 'Type > for more'}
+            </span>
             <span className="text-[9px] text-white/10">↑↓ Enter Esc</span>
           </div>
         </div>
