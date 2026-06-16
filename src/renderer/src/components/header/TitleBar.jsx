@@ -63,32 +63,33 @@ const TitleBar  = ({
       </div>
 
       {showDropdown && (
-        <div ref={dropdownRef} className="absolute top-full left-4 z-50">
-          <div className="w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-b-xl shadow-2xl shadow-black/40 overflow-hidden">
-            <div className="px-3.5 py-2.5">
+        <div ref={dropdownRef} className="absolute top-full left-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="mt-1 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-xl shadow-black/30 overflow-hidden">
+            <div className="px-4 py-3">
               {hasUpdate ? (
                 <>
-                  <p className="text-xs text-white font-medium">
+                  <p className="text-[11px] text-white/90 font-medium">
                     {updateStatus?.status === 'downloaded' ? 'Update ready' : 'Update available'}
                   </p>
-                  <p className="text-[10px] text-zinc-400 mt-0.5">v{updateStatus.version}</p>
+                  <p className="text-[10px] text-white/30 mt-0.5">v{updateStatus.version}</p>
                 </>
               ) : isDownloading ? (
                 <>
-                  <p className="text-xs text-white font-medium">Downloading</p>
-                  <div className="mt-2 h-1 rounded-full bg-white/10 overflow-hidden">
+                  <p className="text-[11px] text-white/90 font-medium">Downloading update</p>
+                  <div className="mt-2 h-1 rounded-full bg-white/[0.06] overflow-hidden">
                     <div className="h-full rounded-full bg-blue-500 transition-all duration-300" style={{ width: `${updateStatus.percent || 0}%` }} />
                   </div>
+                  <p className="text-[10px] text-white/30 mt-1">{updateStatus.percent || 0}%</p>
                 </>
               ) : (
-                <p className="text-xs text-white/60">
-                  {updateStatus?.status === 'not-available' ? 'Up to date' : 'v1.0.0'}
+                <p className="text-[11px] text-white/60">
+                  {updateStatus?.status === 'not-available' ? 'You\'re up to date' : 'v1.0.0'}
                 </p>
               )}
             </div>
 
-            {(hasUpdate || isDownloading) && (
-              <div className="px-3.5 pb-2.5">
+            {(hasUpdate || isDownloading) ? (
+              <div className="px-4 pb-3">
                 {updateStatus?.status === 'available' && (
                   <button
                     onClick={() => { onDownloadUpdate?.(); setShowDropdown(false); }}
@@ -100,22 +101,33 @@ const TitleBar  = ({
                 {updateStatus?.status === 'downloaded' && (
                   <button
                     onClick={() => { onInstallUpdate?.(); setShowDropdown(false); }}
-                    className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-green-500/90 text-white hover:bg-green-600 transition-colors"
+                    className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     Restart to Update
                   </button>
                 )}
               </div>
+            ) : (
+              <div className="border-t border-white/[0.04] px-4 py-2">
+                <button
+                  onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
+                  className="w-full text-[10px] text-white/25 hover:text-white/50 transition-colors"
+                >
+                  Check for updates
+                </button>
+              </div>
             )}
 
-            <div className="border-t border-white/5 px-3.5 py-2">
-              <button
-                onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
-                className="w-full text-[10px] text-zinc-400 hover:text-white transition-colors"
-              >
-                Check for updates
-              </button>
-            </div>
+            {(hasUpdate || isDownloading) && (
+              <div className="border-t border-white/[0.04] px-4 py-2">
+                <button
+                  onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
+                  className="w-full text-[10px] text-white/25 hover:text-white/50 transition-colors"
+                >
+                  Check again
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
