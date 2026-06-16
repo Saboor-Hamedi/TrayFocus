@@ -52,6 +52,9 @@ function App() {
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
+  // Whether the shortcut cheatsheet is open
+  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
+
   // Active content page
   const [activePage, setActivePage] = useState(() => {
     try { return localStorage.getItem('trayfocus-page') || 'chat'; } catch { return 'chat'; }
