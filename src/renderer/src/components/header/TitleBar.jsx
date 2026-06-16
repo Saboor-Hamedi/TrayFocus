@@ -28,6 +28,7 @@ const TitleBar  = ({
     showMinimize = true,
     showMaximize = true,
     pinned = false,
+    titleColor = '',
     backgroundColor = 'bg-zinc-800',
     textColor = 'text-zinc-100'
 }) =>{
@@ -36,7 +37,7 @@ const TitleBar  = ({
 <div className={`flex h-8 w-full select-none items-center justify-between border-b border-zinc-800 ${backgroundColor} ${textColor}`}>
       {/* ---- draggable area — clicking here moves the Electron window ---- */}
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
-        <span className="text-xs font-medium tracking-wide">{title}</span>
+        <span className={`text-xs font-medium tracking-wide ${titleColor}`}>{title}</span>
         {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
       </div>
 

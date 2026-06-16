@@ -251,6 +251,7 @@ function App() {
         title="TrayFocus"
         backgroundColor={theme.titlebar}
         textColor={theme.text}
+        titleColor={accentClass}
         showMinimize={settingsValues.minimizeToTray !== false}
         showMaximize={settingsValues.showMaximize !== false}
         pinned={alwaysOnTop}
