@@ -1,6 +1,6 @@
 {
   "name": "trayfocus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TrayFocus — a lightweight Electron desktop utility",
   "main": "./out/main/index.js",
   "author": "Saboor-Hamedi",
@@ -16,6 +16,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
+    "make:icons": "node scripts/make-icons.js",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
