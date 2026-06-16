@@ -375,16 +375,16 @@ function App() {
         <div className="flex-1 overflow-y-auto">
           <SidebarGroup label="Main">
             <SidebarItem
-              icon={<House className="w-4 h-4" strokeWidth={1.5} />}
-              label="Home"
-              active={activePage === 'home' && !isThemeModalOpen && !isSettingsModalOpen}
-              onClick={() => setActivePage('home')}
-            />
-            <SidebarItem
               icon={<MessageCircle className="w-4 h-4" strokeWidth={1.5} />}
               label="Chat"
               active={activePage === 'chat'}
               onClick={() => setActivePage('chat')}
+            />
+            <SidebarItem
+              icon={<House className="w-4 h-4" strokeWidth={1.5} />}
+              label="Home"
+              active={activePage === 'home' && !isThemeModalOpen && !isSettingsModalOpen}
+              onClick={() => setActivePage('home')}
             />
           </SidebarGroup>
 
