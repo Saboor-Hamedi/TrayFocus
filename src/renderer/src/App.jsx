@@ -9,7 +9,6 @@ import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import AccentPanel from './components/settings/AccentPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
-import SpotlightSearch from './components/modals/SpotlightSearch';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
@@ -42,6 +41,7 @@ function App() {
 
   // Whether the command palette is open or closed
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [paletteMode, setPaletteMode] = useState('commands');
 
   // Whether the sidebar is open or closed
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -51,8 +51,6 @@ function App() {
 
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
-
-  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -113,17 +111,12 @@ function App() {
     setIsThemeModalOpen((prev) => !prev);
   }, []);
 
-  // Toggle the command palette — used by the Ctrl+P shortcut
   const toggleCommandPalette = useCallback(() => {
     setIsCommandPaletteOpen((prev) => !prev);
   }, []);
 
   const toggleCheatsheet = useCallback(() => {
     setIsCheatsheetOpen((prev) => !prev);
-  }, []);
-
-  const toggleSpotlight = useCallback(() => {
-    setIsSpotlightOpen((prev) => !prev);
   }, []);
 
   // Toggle the sidebar — used by the Ctrl+B shortcut
@@ -206,7 +199,7 @@ function App() {
       name: 'Always on Top',
       icon: '📌',
       description: 'Pin the window above all other apps',
-      shortcut: 'Ctrl+Shift+P',
+      shortcut: 'Ctrl+Shift+A',
       keywords: ['pin', 'float', 'ontop'],
       action: toggleAlwaysOnTop,
     },
@@ -234,7 +227,7 @@ function App() {
     });
 
     // Ctrl+P opens/closes the command palette
-    const unregisterPalette = register('p', toggleCommandPalette, {
+    const unregisterPalette = register('p', () => { setPaletteMode('commands'); setIsCommandPaletteOpen(p => !p); }, {
       ctrl: true,
       description: 'Toggle command palette',
       priority: 10,
@@ -254,8 +247,8 @@ function App() {
       priority: 10,
     });
 
-    // Ctrl+Shift+P toggles always-on-top
-    const unregisterPin = register('p', toggleAlwaysOnTop, {
+    // Ctrl+Shift+A toggles always-on-top
+    const unregisterPin = register('a', toggleAlwaysOnTop, {
       ctrl: true,
       shift: true,
       description: 'Toggle always on top',
@@ -269,9 +262,10 @@ function App() {
       priority: 10,
     });
 
-    // Ctrl+Space opens spotlight search
-    const unregisterSpotlight = register(' ', toggleSpotlight, {
+    // Ctrl+Shift+P opens spotlight search
+    const unregisterSpotlight = register('p', () => { setPaletteMode('spotlight'); setIsCommandPaletteOpen(true); }, {
       ctrl: true,
+      shift: true,
       description: 'Spotlight search',
       priority: 10,
     });
@@ -286,7 +280,7 @@ function App() {
       unregisterSpotlight();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet, toggleSpotlight]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -412,7 +406,18 @@ function App() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         commands={commands}
-        theme="dark"
+        mode={paletteMode}
+        placeholder={paletteMode === 'spotlight' ? 'Search anything...' : 'Search commands...'}
+        settings={[
+          { key: 'autostart', label: 'Launch at startup', description: 'Start TrayFocus when you log in' },
+          { key: 'minimizeToTray', label: 'Minimize to tray', description: 'Hide to system tray instead of closing' },
+          { key: 'alwaysOnTop', label: 'Always on top', description: 'Keep TrayFocus above other windows' },
+          { key: 'displayName', label: 'Display name', description: 'Your display name in the app' },
+        ]}
+        spotlightExtras={{
+          onOpenTheme: (id) => { setActiveTheme(id); settings.saveTheme(id); },
+          onOpenSettings: () => setIsSettingsModalOpen(true),
+        }}
       />
 
       {/* ---- settings modal ---- */}
@@ -454,26 +459,6 @@ function App() {
       <ShortcutCheatsheet
         isOpen={isCheatsheetOpen}
         onClose={() => setIsCheatsheetOpen(false)}
-      />
-
-      <SpotlightSearch
-        isOpen={isSpotlightOpen}
-        onClose={() => setIsSpotlightOpen(false)}
-        commands={commands}
-        settings={[
-          { key: 'autostart', label: 'Launch at startup', description: 'Start TrayFocus when you log in' },
-          { key: 'minimizeToTray', label: 'Minimize to tray', description: 'Hide to system tray instead of closing' },
-          { key: 'showMaximize', label: 'Show maximize button', description: 'Show the maximize/restore button on the title bar' },
-          { key: 'alwaysOnTop', label: 'Always on top', description: 'Keep TrayFocus above other windows' },
-          { key: 'displayName', label: 'Display name', description: 'Your display name in the app' },
-          { key: 'fontSize', label: 'Font size', description: 'Adjust the app text size (px)' },
-          { key: 'compactMode', label: 'Compact mode', description: 'Reduce spacing for a denser layout' },
-          { key: 'animationsEnabled', label: 'Animations', description: 'Enable UI transition animations' },
-          { key: 'checkUpdates', label: 'Auto-check updates', description: 'Check for new versions on launch' },
-          { key: 'debugMode', label: 'Debug mode', description: 'Show debug information in console' },
-        ]}
-        onOpenTheme={(id) => { setActiveTheme(id); settings.saveTheme(id); }}
-        onOpenSettings={() => setIsSettingsModalOpen(true)}
       />
     </div>
   );
