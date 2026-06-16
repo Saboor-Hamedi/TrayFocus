@@ -25,8 +25,9 @@ const CommandPalette = ({
   const activeMode = internalMode ?? mode;
   const isSpotlight = activeMode === 'spotlight';
 
-  const themes = useRef(getThemeNames()).current;
-  const shortcuts = useRef(getAll().filter(s => s.description)).current;
+  // These are live — recalculated every render so new registrations appear
+  const themes = getThemeNames();
+  const shortcuts = getAll().filter(s => s.description);
 
   // When mode prop changes (e.g. Ctrl+Shift+P pressed while palette open), update
   useEffect(() => { setInternalMode(null); }, [mode]);
