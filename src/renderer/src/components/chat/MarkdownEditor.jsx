@@ -6,8 +6,8 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Eye, Code2 } from 'lucide-react';
 import Markdown from './Markdown';
 
-const editorTheme = EditorView.theme({
-  '&': { fontSize: '12px', height: '100%', background: 'transparent' },
+const editorTheme = (fs) => EditorView.theme({
+  '&': { fontSize: `${Math.max(fs * 0.85, 11)}px`, height: '100%', background: 'transparent' },
   '.cm-content': { padding: '12px', fontFamily: 'ui-monospace, monospace', caretColor: '#60a5fa' },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.03)' },
   '.cm-selectionBackground': { background: 'rgba(96,165,250,0.2)' },
@@ -44,7 +44,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
         keymap.of([...defaultKeymap, ...historyKeymap]),
         history(),
         placeholder('Write markdown...'),
-        editorTheme,
+        editorTheme(fontSize),
         update,
       ],
       parent: editorRef.current,
@@ -78,7 +78,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
       <div className={`flex ${preview ? 'flex-row' : ''} flex-1 min-h-0 h-full`}>
         <div ref={editorRef} className={`${preview ? 'w-1/2 border-r border-white/[0.06]' : 'w-full'} overflow-hidden`} />
         {preview && (
-          <div className="w-1/2 overflow-y-auto p-3 bg-white/[0.01]">
+          <div className="w-1/2 overflow-y-auto p-3 bg-white/[0.01] select-text">
             <Markdown content={content || 'Nothing to preview'} fontSize={fontSize} accentColor={accentColor} />
           </div>
         )}
