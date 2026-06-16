@@ -8,6 +8,7 @@ import ShortcutsPanel from './components/settings/ShortcutsPanel';
 import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import AccentPanel from './components/settings/AccentPanel';
+import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
@@ -46,6 +47,9 @@ function App() {
 
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  // Whether the shortcut cheatsheet is open
+  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
 
   // Currently active theme ID — loaded from settings.json on mount
   const [activeTheme, setActiveTheme] = useState('zinc');
@@ -90,6 +94,10 @@ function App() {
     setIsCommandPaletteOpen((prev) => !prev);
   }, []);
 
+  const toggleCheatsheet = useCallback(() => {
+    setIsCheatsheetOpen((prev) => !prev);
+  }, []);
+
   // Toggle the sidebar — used by the Ctrl+B shortcut
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
@@ -111,6 +119,15 @@ function App() {
       shortcut: 'Ctrl+,',
       keywords: ['preferences', 'config', 'options'],
       action: () => setIsSettingsModalOpen(true),
+    },
+    {
+      id: 'cheatsheet',
+      name: 'Keyboard Shortcuts',
+      icon: '⌨',
+      description: 'Show all keyboard shortcuts',
+      shortcut: 'Ctrl+/',
+      keywords: ['hotkeys', 'help', 'reference'],
+      action: () => setIsCheatsheetOpen((prev) => !prev),
     },
     {
       id: 'sidebar',
@@ -200,15 +217,23 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+/ shows keyboard shortcuts cheatsheet
+    const unregisterCheatsheet = register('/', toggleCheatsheet, {
+      ctrl: true,
+      description: 'Show keyboard shortcuts',
+      priority: 10,
+    });
+
     return () => {
       unregisterTheme();
       unregisterPalette();
       unregisterSidebar();
       unregisterSettings();
       unregisterPin();
+      unregisterCheatsheet();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -375,6 +400,11 @@ function App() {
         }}
       />
       )}
+
+      <ShortcutCheatsheet
+        isOpen={isCheatsheetOpen}
+        onClose={() => setIsCheatsheetOpen(false)}
+      />
     </div>
   );
 }
