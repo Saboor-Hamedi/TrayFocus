@@ -4,15 +4,16 @@ import Markdown from './Markdown';
 
 const ChatMessage = ({ message, fontSize = 14 }) => {
   const isUser = message.role === 'user';
+  const fs = `${Math.max(fontSize * 0.75, 11)}px`;
   return (
-    <div className={`flex px-3 py-1.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[85%] rounded-xl px-3 py-1.5 rounded-tr-sm rounded-tl-sm ${
+    <div className={`flex px-3 py-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[85%] rounded-xl px-3.5 py-2 ${
         isUser
-          ? 'bg-blue-500/15 text-white/90'
+          ? 'bg-blue-500/15 text-white/90 rounded-tr-sm'
           : message.error
-            ? 'bg-red-500/10 text-red-400'
-            : 'bg-white/[0.04] text-white/80'
-      }`} style={{ fontSize: `${fontSize * 0.8}px` }}>
+            ? 'bg-red-500/10 text-red-400 rounded-tl-sm'
+            : 'bg-white/[0.04] text-white/80 rounded-tl-sm'
+      }`} style={{ fontSize: fs }}>
         {isUser ? message.content : <Markdown content={message.content} fontSize={fontSize} />}
       </div>
     </div>
@@ -45,7 +46,7 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
           placeholder={disabled && !loading ? 'Set API key in Settings → AI' : placeholder}
           disabled={disabled && !loading}
           rows={1}
-          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1.5 pr-8 text-xs text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text"
+          className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 pr-8 text-sm text-white outline-none placeholder:text-white/15 resize-none focus:border-white/10 transition-colors disabled:opacity-30 select-text"
           spellCheck={false}
         />
         <div className="absolute bottom-1.5 right-1.5">

@@ -95,7 +95,7 @@ const ChatPanel = ({ apiKey, providerId, model, fontSize = 14 }) => {
               <p className="text-[10px] text-white/10 mt-1">API keys stored locally in AppData</p>
             </div>
           ) : (
-            messages.map((m, i) => <ChatMessage key={i} message={m} />)
+            messages.map((m, i) => <ChatMessage key={i} message={m} fontSize={fontSize} />)
           )}
         </div>
 
