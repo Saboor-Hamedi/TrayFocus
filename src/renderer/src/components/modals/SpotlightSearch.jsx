@@ -63,8 +63,8 @@ const SpotlightSearch = ({ isOpen, onClose, commands = [], settings = [], onOpen
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15%]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="relative w-full max-w-lg">
-        <div className="flex items-center gap-3 px-4 py-3 bg-zinc-900/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl">
+      <div className="relative w-full max-w-lg bg-zinc-900/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
           <Search className="w-4 h-4 text-white/30 flex-shrink-0" strokeWidth={1.5} />
           <input
             ref={inputRef}
@@ -80,7 +80,7 @@ const SpotlightSearch = ({ isOpen, onClose, commands = [], settings = [], onOpen
         </div>
 
         {results.length > 0 && (
-          <div className="absolute top-full mt-1.5 left-0 right-0 bg-zinc-900/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden max-h-80 overflow-y-auto">
+          <div className="max-h-72 overflow-y-auto py-1">
             {results.map((r, i) => (
               <button
                 key={`${r.kind}-${r.id || r.key || r.label}-${i}`}
@@ -89,7 +89,7 @@ const SpotlightSearch = ({ isOpen, onClose, commands = [], settings = [], onOpen
                   if (r.kind === 'theme') { onOpenTheme?.(r.id); onClose(); }
                   if (r.kind === 'setting') { onOpenSettings?.(); onClose(); }
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${
                   i === selected ? 'bg-white/[0.08]' : 'hover:bg-white/[0.04]'
                 }`}
               >
@@ -102,6 +102,11 @@ const SpotlightSearch = ({ isOpen, onClose, commands = [], settings = [], onOpen
             ))}
           </div>
         )}
+
+        <div className="flex items-center justify-between px-4 py-1.5 border-t border-white/[0.04]">
+          <span className="text-[9px] text-white/15">{results.length} results</span>
+          <span className="text-[9px] text-white/10">↑↓ Enter Esc</span>
+        </div>
       </div>
     </div>
   );
