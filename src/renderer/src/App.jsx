@@ -52,13 +52,24 @@ function App() {
   // Persistent settings loaded from settings.json
   const [settingsValues, setSettingsValues] = useState({});
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [alwaysOnTop, setAlwaysOnTop] = useState(false);
 
   useEffect(() => {
     settings.load().then((data) => {
       setActiveTheme(data.theme || 'zinc');
       setSettingsValues(data);
+      setAlwaysOnTop(data.alwaysOnTop || false);
+      if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
       setSettingsLoaded(true);
     });
+  }, []);
+
+  const toggleAlwaysOnTop = useCallback(() => {
+    try {
+      const pinned = window.electron.ipcRenderer.sendSync('toggle-always-on-top');
+      setAlwaysOnTop(pinned);
+      settings.save({ alwaysOnTop: pinned });
+    } catch { /* noop */ }
   }, []);
 
   // ---- callbacks ----
@@ -128,6 +139,15 @@ function App() {
       action: () => ipcSend('window-minimize'),
     },
     {
+      id: 'pin',
+      name: 'Always on Top',
+      icon: '📌',
+      description: 'Pin the window above all other apps',
+      shortcut: 'Ctrl+Shift+P',
+      keywords: ['pin', 'float', 'ontop'],
+      action: toggleAlwaysOnTop,
+    },
+    {
       id: 'close',
       name: 'Close Window',
       icon: '✕',
@@ -171,14 +191,23 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+Shift+P toggles always-on-top
+    const unregisterPin = register('p', toggleAlwaysOnTop, {
+      ctrl: true,
+      shift: true,
+      description: 'Toggle always on top',
+      priority: 10,
+    });
+
     return () => {
       unregisterTheme();
       unregisterPalette();
       unregisterSidebar();
       unregisterSettings();
+      unregisterPin();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -210,8 +239,11 @@ function App() {
         title="TrayFocus"
         backgroundColor={theme.titlebar}
         textColor={theme.text}
-        showMaximize={false}
+        showMinimize={settingsValues.minimizeToTray !== false}
+        showMaximize={settingsValues.showMaximize !== false}
+        pinned={alwaysOnTop}
         onMinimize={() => ipcSend('window-minimize')}
+        onMaximize={() => ipcSend('window-maximize')}
         onClose={() => ipcSend('window-close')}
       />
 
@@ -297,6 +329,8 @@ function App() {
         settings={[
           { key: 'autostart', category: 'general', label: 'Launch at startup', description: 'Start TrayFocus when you log in', type: 'switch', defaultValue: false },
           { key: 'minimizeToTray', category: 'general', label: 'Minimize to tray', description: 'Hide to system tray instead of closing', type: 'switch', defaultValue: true },
+          { key: 'showMaximize', category: 'general', label: 'Show maximize button', description: 'Show the maximize/restore button on the title bar', type: 'switch', defaultValue: true },
+          { key: 'alwaysOnTop', category: 'general', label: 'Always on top', description: 'Keep TrayFocus above other windows', type: 'switch', defaultValue: false },
           { key: 'displayName', category: 'general', label: 'Display name', description: 'Your display name in the app', type: 'text', defaultValue: 'User', placeholder: 'Enter name' },
         ]}
         categories={[
@@ -310,7 +344,11 @@ function App() {
           appearance: <AppearancePanel />,
           advanced: <AdvancedPanel />,
         }}
-        onSave={(values) => { setSettingsValues(values); settings.save(values); }}
+        onSave={(values) => {
+          setSettingsValues(values);
+          settings.save(values);
+          if (values.alwaysOnTop !== alwaysOnTop) toggleAlwaysOnTop();
+        }}
       />
       )}
     </div>

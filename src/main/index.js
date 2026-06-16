@@ -47,7 +47,7 @@ function createTray() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 450,
+    width: 700,
     height: 600,
     resizable: false,
     show: false,
@@ -106,6 +106,15 @@ ipcMain.on('window-close', () => {
     BrowserWindow.getFocusedWindow()?.hide()
   } else {
     BrowserWindow.getFocusedWindow()?.close()
+  }
+})
+
+ipcMain.on('toggle-always-on-top', (event) => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    const pinned = !win.isAlwaysOnTop()
+    win.setAlwaysOnTop(pinned)
+    event.returnValue = pinned
   }
 })
 

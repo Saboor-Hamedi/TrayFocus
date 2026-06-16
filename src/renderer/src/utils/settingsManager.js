@@ -6,6 +6,8 @@ const defaults = {
   theme: 'zinc',
   autostart: false,
   minimizeToTray: true,
+  showMaximize: true,
+  alwaysOnTop: false,
   displayName: 'User',
   fontSize: 14,
   compactMode: false,

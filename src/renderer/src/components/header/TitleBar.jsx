@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import { Minus, Square, X } from 'lucide-react';
+import { Minus, Square, X, Pin } from 'lucide-react';
 
 // ============================================================
 // Custom frameless title bar for Electron
@@ -27,6 +27,7 @@ const TitleBar  = ({
     onClose,
     showMinimize = true,
     showMaximize = true,
+    pinned = false,
     backgroundColor = 'bg-zinc-800',
     textColor = 'text-zinc-100'
 }) =>{
@@ -36,6 +37,7 @@ const TitleBar  = ({
       {/* ---- draggable area — clicking here moves the Electron window ---- */}
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
         <span className="text-xs font-medium tracking-wide">{title}</span>
+        {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
       </div>
 
       {/* ---- window control buttons — excluded from drag region ---- */}
