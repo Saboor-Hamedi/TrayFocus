@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket } from 'lucide-react';
+import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -8,6 +8,8 @@ import ShortcutsPanel from './components/settings/ShortcutsPanel';
 import AppearancePanel from './components/settings/AppearancePanel';
 import AdvancedPanel from './components/settings/AdvancedPanel';
 import AccentPanel from './components/settings/AccentPanel';
+import ChatPanel from './components/chat/ChatPanel';
+import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import { getTheme, getThemeClass } from './theme';
@@ -48,6 +50,9 @@ function App() {
 
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  // Active content page
+  const [activePage, setActivePage] = useState('home');
 
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
@@ -340,7 +345,15 @@ function App() {
       />
 
       {/* ---- main content area — fills remaining space after title bar ---- */}
+      {activePage === 'chat' ? (
+        <ChatPanel
+          apiKey={settingsValues[settingsValues.aiProvider === 'gemini' ? 'geminiKey' : 'deepseekKey'] || ''}
+          providerId={settingsValues.aiProvider || 'deepseek'}
+          model={settingsValues.aiModel || 'deepseek-chat'}
+        />
+      ) : (
       <main className="flex-1" />
+      )}
 
       {/* ---- sidebar panel (toggles in from the left) ---- */}
       <Sidebar
@@ -366,8 +379,14 @@ function App() {
             <SidebarItem
               icon={<House className="w-4 h-4" strokeWidth={1.5} />}
               label="Home"
-              active={!isThemeModalOpen && !isSettingsModalOpen}
-              onClick={() => {}}
+              active={activePage === 'home' && !isThemeModalOpen && !isSettingsModalOpen}
+              onClick={() => setActivePage('home')}
+            />
+            <SidebarItem
+              icon={<MessageCircle className="w-4 h-4" strokeWidth={1.5} />}
+              label="Chat"
+              active={activePage === 'chat'}
+              onClick={() => setActivePage('chat')}
             />
           </SidebarGroup>
 
@@ -435,12 +454,14 @@ function App() {
           { id: 'accent', label: 'Accent', icon: <PaintBucket className="w-3.5 h-3.5" strokeWidth={1.5} /> },
           { id: 'shortcuts', label: 'Shortcuts', icon: <Keyboard className="w-3.5 h-3.5" strokeWidth={1.5} /> },
           { id: 'advanced', label: 'Advanced', icon: <Wrench className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+          { id: 'ai', label: 'AI', icon: <Key className="w-3.5 h-3.5" strokeWidth={1.5} /> },
         ]}
         customSections={{
           shortcuts: <ShortcutsPanel />,
           appearance: <AppearancePanel />,
           accent: <AccentPanel />,
           advanced: <AdvancedPanel />,
+          ai: <AIPanel />,
         }}
         onSave={(values) => {
           setSettingsValues(values);

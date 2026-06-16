@@ -15,6 +15,10 @@ const defaults = {
   animationsEnabled: true,
   checkUpdates: true,
   debugMode: false,
+  deepseekKey: '',
+  geminiKey: '',
+  aiProvider: 'deepseek',
+  aiModel: 'deepseek-chat',
 };
 
 let cache = null;
