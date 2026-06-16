@@ -1,8 +1,6 @@
-// Renderer-side settings manager — communicates with main process via IPC
-// to read/write settings.json in AppData/trayfocus/
-
-const IPC_LOAD = 'settings-load';
-const IPC_SAVE = 'settings-save';
+// Renderer-side settings manager — communicates with main process via
+// window.settingsAPI (exposed by preload) to read/write settings.json
+// in AppData/trayfocus/
 
 const defaults = {
   theme: 'zinc',
@@ -18,17 +16,16 @@ const defaults = {
 
 let cache = null;
 
-function ipc() {
-  try { return window.electron.ipcRenderer } catch { return null }
+function api() {
+  try { return window.settingsAPI } catch { return null }
 }
 
 export async function load() {
   if (cache) return { ...cache };
-  const r = ipc();
-  if (!r) return { ...defaults };
+  const a = api();
+  if (!a) { cache = { ...defaults }; return { ...cache }; }
   try {
-    const data = await r.invoke(IPC_LOAD);
-    cache = { ...defaults, ...data };
+    cache = { ...defaults, ...(await a.load()) };
   } catch {
     cache = { ...defaults };
   }
@@ -37,15 +34,9 @@ export async function load() {
 
 export async function save(partial) {
   cache = { ...(cache || defaults), ...partial };
-  const r = ipc();
-  if (!r) return;
-  try {
-    await r.invoke(IPC_SAVE, cache);
-  } catch { /* ignore */ }
-}
-
-export function get(key) {
-  return cache ? cache[key] : defaults[key];
+  const a = api();
+  if (!a) return;
+  try { await a.save(cache) } catch { /* ignore */ }
 }
 
 export async function loadTheme() {
