@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { House, Palette, Cog } from 'lucide-react';
+import { House, Palette, Cog, Zap, Keyboard, Wrench } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -218,18 +218,17 @@ function App() {
   const accentClass = useMemo(() => getAccentClass(activeTheme), [activeTheme]);
 
   const settingsStyle = useMemo(() => ({
-    bg: theme.bg,
-    border: 'border-white/10',
-    text: theme.text,
-    textMuted: 'text-white/40',
-    hover: 'hover:bg-white/5',
-    active: `${accentClass} bg-white/10`,
-    toggle: accentClass,
-    input: 'bg-white/5 border-white/10 text-white',
-    inputFocus: 'border-white/20',
+    bg: 'bg-zinc-900/95',
+    border: 'border-zinc-800',
+    text: 'text-white',
+    textMuted: 'text-zinc-400',
+    hover: 'hover:bg-zinc-800/50',
+    active: `${accentClass} bg-zinc-800/50`,
+    input: 'bg-zinc-800/50 border-zinc-700 text-white',
+    inputFocus: 'border-zinc-500',
     scrollbar: 'scrollbar-thumb-zinc-700',
     shadow: 'shadow-2xl',
-  }), [theme, accentClass]);
+  }), [accentClass]);
 
   const sidebarStyle = useMemo(() => ({
     bg: theme.bg,
@@ -238,7 +237,6 @@ function App() {
     textMuted: 'text-white/40',
     hover: 'hover:bg-white/5',
     active: `${accentClass} bg-white/10`,
-    toggle: accentClass,
     activeBg: 'bg-white/5',
     divider: 'border-white/10',
     scrollbar: 'scrollbar-thumb-zinc-700',
@@ -349,10 +347,10 @@ function App() {
           { key: 'displayName', category: 'general', label: 'Display name', description: 'Your display name in the app', type: 'text', defaultValue: 'User', placeholder: 'Enter name' },
         ]}
         categories={[
-          { id: 'general', label: 'General', icon: '⚡' },
-          { id: 'appearance', label: 'Appearance', icon: '🎨' },
-          { id: 'shortcuts', label: 'Shortcuts', icon: '⌨' },
-          { id: 'advanced', label: 'Advanced', icon: '🔧' },
+          { id: 'general', label: 'General', icon: <Zap className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+          { id: 'appearance', label: 'Appearance', icon: <Palette className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+          { id: 'shortcuts', label: 'Shortcuts', icon: <Keyboard className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+          { id: 'advanced', label: 'Advanced', icon: <Wrench className="w-3.5 h-3.5" strokeWidth={1.5} /> },
         ]}
         customSections={{
           shortcuts: <ShortcutsPanel />,
