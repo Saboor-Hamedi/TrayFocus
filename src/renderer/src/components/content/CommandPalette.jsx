@@ -26,10 +26,24 @@ const CommandPalette = ({
   const activeMode = internalMode ?? mode;
   const isSpotlight = activeMode === 'spotlight';
 
-  const themes = useRef(getThemeNames()).current;
-  const shortcuts = useRef(getAll().filter(s => s.description)).current;
+  // When typing '>', strip it and switch to spotlight. When in spotlight and input
+  // is cleared, switch back to commands.
+  const handleChange = (v) => {
+    if (!isSpotlight && v === '>') {
+      setSearch('');
+      setInternalMode('spotlight');
+      return;
+    }
+    if (isSpotlight && v === '') {
+      setInternalMode('commands');
+      setSearch('');
+      return;
+    }
+    setSearch(v);
+  };
 
-  const query = isSpotlight ? search.replace(/^>\s*/, '') : search;
+  // Query to filter: use search text directly, stripping any '>' if somehow present
+  const query = search.replace(/^>\s*/, '');
 
   const filterResults = useCallback((q) => {
     if (!q.trim()) return [];
@@ -134,15 +148,7 @@ const CommandPalette = ({
               ref={inputRef}
               type="text"
               value={search}
-              onChange={(e) => {
-                const v = e.target.value;
-                setSearch(v);
-                if (!isSpotlight && v.trim().startsWith('>')) {
-                  setInternalMode('spotlight');
-                } else if (isSpotlight && !v.startsWith('>')) {
-                  setInternalMode('commands');
-                }
-              }}
+              onChange={(e) => handleChange(e.target.value)}
               placeholder={isSpotlight ? 'Search anything...' : placeholder}
               className={`w-full pl-10 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
               spellCheck={false}
