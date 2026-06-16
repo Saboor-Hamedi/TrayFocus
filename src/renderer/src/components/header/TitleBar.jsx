@@ -42,20 +42,38 @@ const TitleBar  = ({
         {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
 
         <button
-          onClick={() => setShowDropdown(!showDropdown)}
-          className={`ml-2 flex items-center justify-center size-5 rounded transition-colors [app-region:no-drag] ${
+          onClick={() => {
+            if (updateStatus?.status === 'downloaded') { onInstallUpdate?.(); return; }
+            setShowDropdown(!showDropdown);
+          }}
+          className={`ml-2 relative flex items-center justify-center size-6 rounded-full transition-all [app-region:no-drag] ${
             updateStatus?.status === 'downloaded'
-              ? 'text-green-400 hover:bg-green-500/10'
+              ? 'bg-green-500/15 text-green-400 hover:bg-green-500/25'
               : isDownloading
-                ? 'text-blue-400'
+                ? 'bg-blue-500/10 text-blue-400'
                 : hasUpdate
                   ? 'text-blue-400 hover:bg-blue-500/10'
-                  : 'text-white/20 hover:text-white/50 hover:bg-white/5'
+                  : 'text-white/20 hover:text-white/40 hover:bg-white/5'
           }`}
-          title="Updates"
+          title={updateStatus?.status === 'downloaded' ? 'Restart to update' : 'Updates'}
         >
           {isDownloading ? (
-            <RefreshCw className="h-3 w-3 animate-spin" strokeWidth={2.5} />
+            <>
+              <RefreshCw className="h-3 w-3 animate-spin" strokeWidth={2.5} />
+              {updateStatus.percent > 0 && (
+                <svg className="absolute inset-0 h-6 w-6 -rotate-90" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.15" />
+                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5"
+                    strokeDasharray={`${(updateStatus.percent / 100) * 62.83} 62.83`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </>
+          ) : updateStatus?.status === 'downloaded' ? (
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 12v.01M12 4v.01M20 12v.01M12 20v.01M6 18L18 6" />
+            </svg>
           ) : (
             <Download className="h-3 w-3" strokeWidth={2} />
           )}
