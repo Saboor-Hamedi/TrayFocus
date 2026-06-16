@@ -321,19 +321,7 @@ function App() {
       />
 
       {/* ---- main content area — fills remaining space after title bar ---- */}
-      <main className="flex-1 p-6 flex flex-col items-center justify-center">
-        <div className="text-center">
-          <p className="text-xs font-medium opacity-60 mb-1">TrayFocus</p>
-          <p className="text-[10px] opacity-25 mb-4">v{pkg.version}</p>
-
-          <p className="text-[10px] opacity-25">
-            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+B</kbd> Sidebar &nbsp;
-            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+T</kbd> Theme &nbsp;
-            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+P</kbd> Commands &nbsp;
-            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+/</kbd> Shortcuts
-          </p>
-        </div>
-      </main>
+      <main className="flex-1" />
 
       {/* ---- sidebar panel (toggles in from the left) ---- */}
       <Sidebar
