@@ -355,9 +355,10 @@ function App() {
           apiKey={settingsValues[settingsValues.aiProvider === 'gemini' ? 'geminiKey' : 'deepseekKey'] || ''}
           providerId={settingsValues.aiProvider || 'deepseek'}
           model={settingsValues.aiModel || 'deepseek-chat'}
+          fontSize={settingsValues.fontSize || 14}
         />
       ) : activePage === 'markdown' ? (
-        <MarkdownEditor />
+        <MarkdownEditor fontSize={settingsValues.fontSize || 14} />
       ) : (
       <main className="flex-1" />
       )}

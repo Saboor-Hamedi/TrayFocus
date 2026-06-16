@@ -2,18 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Square } from 'lucide-react';
 import Markdown from './Markdown';
 
-const ChatMessage = ({ message }) => {
+const ChatMessage = ({ message, fontSize = 14 }) => {
   const isUser = message.role === 'user';
   return (
     <div className={`flex px-3 py-1.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[85%] rounded-xl px-3 py-1.5 text-[11px] leading-relaxed ${
+      <div className={`max-w-[85%] rounded-xl px-3 py-1.5 rounded-tr-sm rounded-tl-sm ${
         isUser
-          ? 'bg-blue-500/15 text-white/90 rounded-tr-sm'
+          ? 'bg-blue-500/15 text-white/90'
           : message.error
-            ? 'bg-red-500/10 text-red-400 rounded-tl-sm'
-            : 'bg-white/[0.04] text-white/80 rounded-tl-sm'
-      }`}>
-        {isUser ? message.content : <Markdown content={message.content} />}
+            ? 'bg-red-500/10 text-red-400'
+            : 'bg-white/[0.04] text-white/80'
+      }`} style={{ fontSize: `${fontSize * 0.8}px` }}>
+        {isUser ? message.content : <Markdown content={message.content} fontSize={fontSize} />}
       </div>
     </div>
   );

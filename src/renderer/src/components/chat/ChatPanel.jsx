@@ -8,7 +8,7 @@ const SYSTEM_PROMPT = {
   content: 'You are a helpful, concise assistant. Always respond in English. Be accurate, direct, and helpful. Use clear markdown formatting for code blocks, lists, and emphasis.',
 };
 
-const ChatPanel = ({ apiKey, providerId, model }) => {
+const ChatPanel = ({ apiKey, providerId, model, fontSize = 14 }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

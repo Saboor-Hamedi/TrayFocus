@@ -169,12 +169,14 @@ class ShortcutManager {
 
   // Handle keydown events
   handleKeyDown(event) {
-    // Skip if in input/textarea/select
+    // Only skip plain keystrokes in inputs — allow modifier combos (Ctrl+B, Ctrl+P, etc.)
     const target = event.target;
-    if (target.tagName === 'INPUT' || 
+    const isInput = target.tagName === 'INPUT' || 
         target.tagName === 'TEXTAREA' || 
         target.tagName === 'SELECT' ||
-        target.isContentEditable) {
+        target.isContentEditable;
+
+    if (isInput && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
       return;
     }
 
