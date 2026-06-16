@@ -295,7 +295,7 @@ function App() {
             <SidebarItem
               icon={<House className="w-4 h-4" strokeWidth={1.5} />}
               label="Home"
-              active
+              active={!isThemeModalOpen && !isSettingsModalOpen}
               onClick={() => {}}
             />
           </SidebarGroup>
@@ -305,17 +305,21 @@ function App() {
               icon={<Palette className="w-4 h-4" strokeWidth={1.5} />}
               label="Theme"
               shortcut="Ctrl+T"
-              onClick={() => { setIsSidebarOpen(false); setIsThemeModalOpen(true); }}
+              active={isThemeModalOpen}
+              onClick={() => { setIsThemeModalOpen(true); }}
+            />
+          </SidebarGroup>
+
+          <SidebarGroup label="Preferences">
+            <SidebarItem
+              icon={<Cog className="w-4 h-4" strokeWidth={1.5} />}
+              label="Settings"
+              shortcut="Ctrl+,"
+              active={isSettingsModalOpen}
+              onClick={() => { setIsSettingsModalOpen(true); }}
             />
           </SidebarGroup>
         </div>
-
-        <SidebarDivider />
-        <SidebarItem
-          icon={<Cog className="w-4 h-4" strokeWidth={1.5} />}
-          label="Settings"
-          onClick={() => { setIsSidebarOpen(false); setIsSettingsModalOpen(true); }}
-        />
       </Sidebar>
 
       {/* ---- theme picker modal (rendered here so it can cover full screen) ---- */}
