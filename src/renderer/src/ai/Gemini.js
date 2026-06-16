@@ -3,8 +3,7 @@
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-export async function chat(messages, apiKey, { temperature = 0.7, maxTokens = 2048 } = {}) {
-  // Convert OpenAI-style messages to Gemini format
+export async function chat(messages, apiKey, { temperature = 0.7, maxTokens = 2048, signal } = {}) {
   const contents = messages.map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }],
@@ -17,6 +16,7 @@ export async function chat(messages, apiKey, { temperature = 0.7, maxTokens = 20
       contents,
       generationConfig: { temperature, maxOutputTokens: maxTokens },
     }),
+    signal,
   });
 
   if (!res.ok) {

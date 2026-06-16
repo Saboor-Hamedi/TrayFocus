@@ -3,7 +3,7 @@
 
 const ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
 
-export async function chat(messages, apiKey, { model = 'deepseek-chat', temperature = 0.7, maxTokens = 2048 } = {}) {
+export async function chat(messages, apiKey, { model = 'deepseek-chat', temperature = 0.7, maxTokens = 2048, signal } = {}) {
   const res = await fetch(ENDPOINT, {
     method: 'POST',
     headers: {
@@ -17,6 +17,7 @@ export async function chat(messages, apiKey, { model = 'deepseek-chat', temperat
       max_tokens: maxTokens,
       stream: false,
     }),
+    signal,
   });
 
   if (!res.ok) {

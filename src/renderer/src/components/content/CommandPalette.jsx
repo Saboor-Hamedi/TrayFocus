@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { getThemeNames } from '../../theme';
 import { getAll } from '../../utils/ShortcutManager';
@@ -26,8 +26,8 @@ const CommandPalette = ({
   const isSpotlight = activeMode === 'spotlight';
 
   // These are live — recalculated every render so new registrations appear
-  const themes = getThemeNames();
-  const shortcuts = getAll().filter(s => s.description);
+  const themes = useMemo(() => getThemeNames(), []);
+  const shortcuts = useMemo(() => getAll().filter(s => s.description), []);
 
   // When mode prop changes (e.g. Ctrl+Shift+P pressed while palette open), update
   useEffect(() => { setInternalMode(null); }, [mode]);
@@ -51,26 +51,34 @@ const CommandPalette = ({
   // Search query: strip leading '> ' when in spotlight
   const query = isSpotlight ? search.replace(/^>\s*/, '') : search;
 
+  // Use refs for live data access inside callbacks to avoid stale closures
+  const themesRef = useRef(themes);
+  themesRef.current = themes;
+  const shortcutsRef = useRef(shortcuts);
+  shortcutsRef.current = shortcuts;
+
   const filterResults = useCallback((q) => {
     if (!isSpotlight || !q.trim()) return [];
 
     const lower = q.toLowerCase().trim();
     const all = [];
+    const t = themesRef.current;
+    const sc = shortcutsRef.current;
 
     all.push(...commands
       .filter(c => c.name.toLowerCase().includes(lower) || c.keywords?.some(k => k.includes(lower)))
       .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) })));
 
-    all.push(...themes
+    all.push(...t
       .filter(t => t.name.toLowerCase().includes(lower))
       .map(t => ({ ...t, kind: 'theme', label: t.name, action: () => spotlightExtras.onOpenTheme?.(t.id), score: 5 })));
 
-    all.push(...shortcuts
+    all.push(...sc
       .filter(s => s.description.toLowerCase().includes(lower))
       .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
-  }, [isSpotlight, commands, themes, shortcuts, spotlightExtras]);
+  }, [isSpotlight, commands, spotlightExtras]);
 
   const score = (name, keywords = [], q) => {
     const combined = `${name.toLowerCase()} ${keywords.join(' ').toLowerCase()}`;
