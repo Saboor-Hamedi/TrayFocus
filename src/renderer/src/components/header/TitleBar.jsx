@@ -38,72 +38,76 @@ const TitleBar  = ({
         {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
 
         {(
-          <div className="relative ml-3 [app-region:no-drag]" ref={dropdownRef}>
+          <div className="relative ml-2 [app-region:no-drag]" ref={dropdownRef}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className={`flex items-center gap-1 h-5 px-1.5 rounded text-[9px] font-medium transition-colors ${
+              className={`flex items-center justify-center size-5 rounded transition-colors ${
                 updateStatus?.status === 'downloaded'
-                  ? 'bg-green-500/20 text-green-400'
-                  : hasUpdate || isDownloading
-                    ? 'bg-blue-500/15 text-blue-400'
-                    : 'text-white/25 hover:text-white/50 hover:bg-white/5'
+                  ? 'text-green-400 hover:bg-green-500/10'
+                  : isDownloading
+                    ? 'text-blue-400'
+                    : hasUpdate
+                      ? 'text-blue-400 hover:bg-blue-500/10'
+                      : 'text-white/20 hover:text-white/50 hover:bg-white/5'
               }`}
+              title="Updates"
             >
               {isDownloading ? (
-                <RefreshCw className="h-2.5 w-2.5 animate-spin" strokeWidth={2.5} />
-              ) : hasUpdate ? (
-                <Download className="h-2.5 w-2.5" strokeWidth={2.5} />
+                <RefreshCw className="h-3 w-3 animate-spin" strokeWidth={2.5} />
               ) : (
-                <Download className="h-2.5 w-2.5" strokeWidth={1.5} />
+                <Download className="h-3 w-3" strokeWidth={2} />
               )}
-              {isDownloading ? `${updateStatus.percent}%` : hasUpdate ? 'Update' : ''}
             </button>
 
             {showDropdown && (
-              <div className="absolute top-full mt-1 left-0 w-56 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl overflow-hidden z-50">
-                <div className="px-3 py-2.5 border-b border-zinc-800">
-                  <p className="text-[10px] text-white/80 font-medium">
-                    {updateStatus?.status === 'downloaded' ? 'Update Ready' 
-                      : hasUpdate ? 'Update Available' 
-                      : updateStatus?.status === 'not-available' ? 'Up to Date'
-                      : 'TrayFocus'}
-                  </p>
+              <div className="absolute top-full mt-1.5 -left-20 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-50">
+                <div className="px-3.5 py-2.5">
                   {hasUpdate ? (
-                    <p className="text-[10px] text-zinc-400 mt-0.5">Version {updateStatus.version}</p>
+                    <>
+                      <p className="text-xs text-white font-medium">
+                        {updateStatus?.status === 'downloaded' ? 'Update ready' : 'Update available'}
+                      </p>
+                      <p className="text-[10px] text-zinc-400 mt-0.5">v{updateStatus.version}</p>
+                    </>
+                  ) : isDownloading ? (
+                    <>
+                      <p className="text-xs text-white font-medium">Downloading</p>
+                      <div className="mt-2 h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full rounded-full bg-blue-500 transition-all duration-300" style={{ width: `${updateStatus.percent || 0}%` }} />
+                      </div>
+                    </>
                   ) : (
-                    <p className="text-[10px] text-zinc-400 mt-0.5">v1.0.0</p>
+                    <p className="text-xs text-white/60">v1.0.0</p>
                   )}
                 </div>
-                <div className="p-2">
-                  {updateStatus?.status === 'available' && (
-                    <button
-                      onClick={() => { onDownloadUpdate?.(); setShowDropdown(false); }}
-                      className="w-full px-2 py-1.5 text-[10px] font-medium rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-                    >
-                      Download Update
-                    </button>
-                  )}
-                  {updateStatus?.status === 'downloaded' && (
-                    <button
-                      onClick={() => { onInstallUpdate?.(); setShowDropdown(false); }}
-                      className="w-full px-2 py-1.5 text-[10px] font-medium rounded bg-green-500 text-white hover:bg-green-600 transition-colors"
-                    >
-                      Restart to Update
-                    </button>
-                  )}
-                  {updateStatus?.status === 'downloading' && (
-                    <div className="px-2 py-1.5">
-                      <div className="h-1 rounded-full bg-white/10 overflow-hidden mb-1.5">
-                        <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${updateStatus.percent || 0}%` }} />
-                      </div>
-                      <p className="text-[10px] text-zinc-400 text-center">{updateStatus.percent}%</p>
-                    </div>
-                  )}
+
+                {(hasUpdate || isDownloading) && (
+                  <div className="px-3.5 pb-2.5">
+                    {updateStatus?.status === 'available' && (
+                      <button
+                        onClick={() => { onDownloadUpdate?.(); setShowDropdown(false); }}
+                        className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                      >
+                        Download & Install
+                      </button>
+                    )}
+                    {updateStatus?.status === 'downloaded' && (
+                      <button
+                        onClick={() => { onInstallUpdate?.(); setShowDropdown(false); }}
+                        className="w-full px-3 py-1.5 text-[11px] font-medium rounded-md bg-green-500/90 text-white hover:bg-green-600 transition-colors"
+                      >
+                        Restart to Update
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="border-t border-white/5 px-3.5 py-2">
                   <button
                     onClick={() => { onCheckUpdate?.(); setShowDropdown(false); }}
-                    className="w-full mt-1 px-2 py-1.5 text-[10px] font-medium rounded text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                    className="w-full text-[10px] text-zinc-400 hover:text-white transition-colors"
                   >
-                    {hasUpdate || isDownloading ? 'Check Again' : 'Check for Updates'}
+                    Check for updates
                   </button>
                 </div>
               </div>
