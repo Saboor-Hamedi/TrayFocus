@@ -111,7 +111,7 @@ export class ErrorBoundary extends React.Component {
                           {copied ? 'Copied!' : 'Copy'}
                         </button>
                       </div>
-                      <pre className="p-3 text-[10px] leading-relaxed text-red-300/70 font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap break-all">
+                      <pre className="p-3 text-[10px] leading-relaxed text-red-300/70 font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap break-all select-text cursor-text">
                         {error?.stack || 'No stack trace'}
                         {info?.componentStack && (
                           <>

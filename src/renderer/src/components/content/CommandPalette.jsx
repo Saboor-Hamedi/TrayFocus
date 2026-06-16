@@ -26,6 +26,12 @@ const CommandPalette = ({
   const activeMode = internalMode ?? mode;
   const isSpotlight = activeMode === 'spotlight';
 
+  const themes = useRef(getThemeNames()).current;
+  const shortcuts = useRef(getAll().filter(s => s.description)).current;
+
+  // When mode prop changes (e.g. Ctrl+Shift+P pressed while palette open), update
+  useEffect(() => { setInternalMode(null); }, [mode]);
+
   // When typing '>', strip it and switch to spotlight. When in spotlight and input
   // is cleared, switch back to commands.
   const handleChange = (v) => {
