@@ -281,6 +281,7 @@ function App() {
         width="w-56"
         collapsible={false}
         theme={sidebarStyle}
+        closeOnOverlayClick={false}
       >
         <SidebarHeader
           title="TrayFocus"
@@ -310,16 +311,16 @@ function App() {
             />
           </SidebarGroup>
 
-          <SidebarGroup label="Preferences">
-            <SidebarItem
-              icon={<Cog className="w-4 h-4" strokeWidth={1.5} />}
-              label="Settings"
-              shortcut="Ctrl+,"
-              active={isSettingsModalOpen}
-              onClick={() => { setIsSettingsModalOpen(true); }}
-            />
-          </SidebarGroup>
         </div>
+
+        <SidebarDivider />
+        <SidebarItem
+          icon={<Cog className="w-4 h-4" strokeWidth={1.5} />}
+          label="Settings"
+          shortcut="Ctrl+,"
+          active={isSettingsModalOpen}
+          onClick={() => { setIsSettingsModalOpen(true); }}
+        />
       </Sidebar>
 
       {/* ---- theme picker modal (rendered here so it can cover full screen) ---- */}
