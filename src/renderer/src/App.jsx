@@ -53,7 +53,7 @@ function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // Active content page
-  const [activePage, setActivePage] = useState('home');
+  const [activePage, setActivePage] = useState('chat');
 
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
@@ -73,12 +73,16 @@ function App() {
   useEffect(() => {
     settings.load().then((data) => {
       setActiveTheme(data.theme || 'zinc');
+      setActivePage(data.activePage || 'chat');
       setSettingsValues(data);
       setAlwaysOnTop(data.alwaysOnTop || false);
       if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
       setSettingsLoaded(true);
     });
   }, []);
+
+  // Persist active page
+  useEffect(() => { settings.save({ activePage }); }, [activePage]);
 
   // Listen for update events from main process
   useEffect(() => {

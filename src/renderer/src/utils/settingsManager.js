@@ -19,6 +19,7 @@ const defaults = {
   geminiKey: '',
   aiProvider: 'deepseek',
   aiModel: 'deepseek-chat',
+  activePage: 'chat',
 };
 
 let cache = null;
