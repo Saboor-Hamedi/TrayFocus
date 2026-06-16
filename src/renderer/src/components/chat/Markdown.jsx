@@ -84,7 +84,7 @@ const Markdown = ({ content, fontSize = 14, accentColor = '' }) => {
       className={
         'prose prose-invert max-w-none font-sans leading-relaxed break-words select-text ' +
         '[&_.cb-wrap]:my-2 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.06] [&_.cb-wrap]:bg-black/30 ' +
-        '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-0.5 [&_.cb-head]:text-[9px] [&_.cb-head]:text-white/15 [&_.cb-head]:font-mono ' +
+        '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3 [&_.cb-head]:py-0.5 [&_.cb-head]:text-[9px] [&_.cb-head]:text-white/10 [&_.cb-head]:font-mono ' +
         '[&_.cb-btn]:text-[10px] [&_.cb-btn]:text-white/25 [&_.cb-btn]:hover:text-white/50 [&_.cb-btn]:bg-transparent [&_.cb-btn]:border-0 [&_.cb-btn]:cursor-pointer [&_.cb-btn]:transition-colors [&_.cb-btn]:font-sans [&_.cb-btn]:outline-none [&_.cb-btn]:p-0 ' +
         '[&_.cb-wrap_pre]:m-0 [&_.cb-wrap_pre]:bg-transparent [&_.cb-wrap_pre]:p-3 [&_.cb-wrap_pre]:overflow-x-auto [&_.cb-wrap_pre]:rounded-none ' +
         '[&_.cb-wrap_code]:text-[11px] [&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed ' +
