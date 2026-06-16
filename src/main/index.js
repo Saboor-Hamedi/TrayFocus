@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as fs from 'fs'
+import { initAutoUpdater } from './updater'
 
 const settingsPath = () => {
   const dir = app.getPath('userData')
@@ -129,6 +130,7 @@ app.whenReady().then(() => {
 
   createWindow()
   createTray()
+  initAutoUpdater(mainWindow)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

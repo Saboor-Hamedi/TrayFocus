@@ -51,6 +51,9 @@ function App() {
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
 
+  // Update status (from main process auto-updater)
+  const [updateStatus, setUpdateStatus] = useState(null);
+
   // Currently active theme ID — loaded from settings.json on mount
   const [activeTheme, setActiveTheme] = useState('zinc');
 
@@ -68,6 +71,23 @@ function App() {
       setSettingsLoaded(true);
     });
   }, []);
+
+  // Listen for update events from main process
+  useEffect(() => {
+    try {
+      const { ipcRenderer } = window.electron;
+      const handler = (_e, status) => setUpdateStatus(status);
+      ipcRenderer.on('update-status', handler);
+      return () => ipcRenderer.removeListener('update-status', handler);
+    } catch { /* noop */ }
+  }, []);
+
+  // Check for updates on startup (if enabled)
+  useEffect(() => {
+    if (settingsLoaded && settingsValues.checkUpdates !== false) {
+      ipcSend('check-for-updates');
+    }
+  }, [settingsLoaded, settingsValues.checkUpdates]);
 
   const toggleAlwaysOnTop = useCallback(() => {
     try {
@@ -290,10 +310,33 @@ function App() {
       {/* ---- main content area — fills remaining space after title bar ---- */}
       <main className="flex-1 p-6 flex flex-col items-center justify-center">
         <div className="text-center">
+          <p className="text-xs font-medium opacity-60 mb-1">TrayFocus</p>
+          <p className="text-[10px] opacity-25 mb-4">v{pkg.version}</p>
+
+          {updateStatus?.status === 'available' && (
+            <p className="text-[10px] text-blue-400/80 mb-2">
+              v{updateStatus.version} available — restart to update
+            </p>
+          )}
+          {updateStatus?.status === 'downloading' && (
+            <p className="text-[10px] text-blue-400/80 mb-2">
+              Downloading update... {updateStatus.percent}%
+            </p>
+          )}
+          {updateStatus?.status === 'downloaded' && (
+            <button onClick={() => ipcSend('install-update')} className="text-[10px] text-green-400/80 hover:underline mb-2">
+              Update ready — restart now
+            </button>
+          )}
+          {updateStatus?.status === 'not-available' && (
+            <p className="text-[10px] text-white/20 mb-2">Up to date</p>
+          )}
+
           <p className="text-[10px] opacity-25">
             <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+B</kbd> Sidebar &nbsp;
             <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+T</kbd> Theme &nbsp;
-            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+P</kbd> Commands
+            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+P</kbd> Commands &nbsp;
+            <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-[9px]">Ctrl+/</kbd> Shortcuts
           </p>
         </div>
       </main>
