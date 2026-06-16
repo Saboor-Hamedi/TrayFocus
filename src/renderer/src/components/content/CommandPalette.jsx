@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
 import { getThemeNames } from '../../theme';
 import { getAll } from '../../utils/ShortcutManager';
@@ -7,7 +7,7 @@ const CommandPalette = ({
   isOpen,
   onClose,
   commands = [],
-  mode = 'commands', // 'commands' or 'spotlight'
+  mode = 'commands',
   settings = [],
   spotlightExtras = {},
   placeholder = "Search commands...",
@@ -21,11 +21,17 @@ const CommandPalette = ({
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  const isSpotlight = mode === 'spotlight';
+  // Internal mode — toggled by typing/deleting ">" prefix like VS Code
+  const [internalMode, setInternalMode] = useState(null);
+  const activeMode = internalMode ?? mode;
+  const isSpotlight = activeMode === 'spotlight';
+
   const themes = useRef(getThemeNames()).current;
   const shortcuts = useRef(getAll().filter(s => s.description)).current;
 
-  const filterResults = (q) => {
+  const query = isSpotlight ? search.replace(/^>\s*/, '') : search;
+
+  const filterResults = useCallback((q) => {
     if (!q.trim()) return [];
 
     const lower = q.toLowerCase().trim();
@@ -50,7 +56,7 @@ const CommandPalette = ({
     }
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
-  };
+  }, [isSpotlight, commands, themes, shortcuts, settings, spotlightExtras]);
 
   const score = (name, keywords = [], q) => {
     const combined = `${name.toLowerCase()} ${keywords.join(' ').toLowerCase()}`;
@@ -58,16 +64,16 @@ const CommandPalette = ({
   };
 
   useEffect(() => {
-    if (!search.trim()) {
+    if (!query.trim()) {
       setResults([]);
       return;
     }
-    setResults(filterResults(search));
+    setResults(filterResults(query));
     setSelectedIndex(0);
-  }, [search, commands]);
+  }, [query, filterResults]);
 
   useEffect(() => {
-    if (isOpen) { setSearch(''); setSelectedIndex(0); setTimeout(() => inputRef.current?.focus(), 20); }
+    if (isOpen) { setSearch(''); setInternalMode(null); setSelectedIndex(0); setTimeout(() => inputRef.current?.focus(), 20); }
   }, [isOpen]);
 
   useEffect(() => {
@@ -112,6 +118,8 @@ const CommandPalette = ({
   };
   const style = theme.dark;
 
+  const displayMode = isSpotlight ? 'spotlight' : 'commands';
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15%] p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={onClose} />
@@ -126,8 +134,16 @@ const CommandPalette = ({
               ref={inputRef}
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={placeholder}
+              onChange={(e) => {
+                const v = e.target.value;
+                setSearch(v);
+                if (!isSpotlight && v.trim().startsWith('>')) {
+                  setInternalMode('spotlight');
+                } else if (isSpotlight && !v.startsWith('>')) {
+                  setInternalMode('commands');
+                }
+              }}
+              placeholder={isSpotlight ? 'Search anything...' : placeholder}
               className={`w-full pl-10 pr-3 py-2.5 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20`}
               spellCheck={false}
               autoComplete="off"
@@ -138,7 +154,7 @@ const CommandPalette = ({
           </div>
 
           <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
-            {results.length === 0 && search.trim() ? (
+            {results.length === 0 && query.trim() ? (
               <div className="px-4 py-6 text-center text-white/20">
                 <p className="text-xs">{emptyMessage}</p>
               </div>
