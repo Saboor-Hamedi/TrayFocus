@@ -1,0 +1,122 @@
+import React, { useState } from 'react';
+import { useSettings } from '../modals/SettingsModal';
+
+const SettingsItem = ({ setting }) => {
+  const { values, handleChange, errors, style } = useSettings();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const value = values[setting.key] ?? setting.defaultValue ?? '';
+  const error = errors[setting.key];
+
+  const renderInput = () => {
+    switch (setting.type) {
+      case 'text':
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleChange(setting.key, e.target.value)}
+            placeholder={setting.placeholder}
+            className={`w-full px-3 py-2 text-sm rounded-lg border ${style.input} ${style.inputFocus} outline-none transition-all ${
+              error ? 'border-red-500 ring-1 ring-red-500/20' : ''
+            }`}
+          />
+        );
+      case 'number':
+        return (
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => handleChange(setting.key, parseFloat(e.target.value) || 0)}
+            min={setting.min}
+            max={setting.max}
+            step={setting.step || 1}
+            className={`w-full px-3 py-2 text-sm rounded-lg border ${style.input} ${style.inputFocus} outline-none transition-all ${
+              error ? 'border-red-500 ring-1 ring-red-500/20' : ''
+            }`}
+          />
+        );
+      case 'textarea':
+        return (
+          <textarea
+            value={value}
+            onChange={(e) => handleChange(setting.key, e.target.value)}
+            placeholder={setting.placeholder}
+            rows={setting.rows || 3}
+            className={`w-full px-3 py-2 text-sm rounded-lg border ${style.input} ${style.inputFocus} outline-none transition-all resize-none ${
+              error ? 'border-red-500 ring-1 ring-red-500/20' : ''
+            }`}
+          />
+        );
+      case 'select':
+        return (
+          <select
+            value={value}
+            onChange={(e) => handleChange(setting.key, e.target.value)}
+            className={`w-full px-3 py-2 text-sm rounded-lg border ${style.input} ${style.inputFocus} outline-none transition-all ${
+              error ? 'border-red-500 ring-1 ring-red-500/20' : ''
+            }`}
+          >
+            {setting.options?.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        );
+      case 'switch':
+        return (
+          <button
+            onClick={() => handleChange(setting.key, !value)}
+            className={`relative w-11 h-6 rounded-full transition-colors ${value ? 'bg-blue-500' : 'bg-zinc-700'}`}
+          >
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+        );
+      case 'checkbox':
+        return (
+          <input
+            type="checkbox"
+            checked={value}
+            onChange={(e) => handleChange(setting.key, e.target.checked)}
+            className="w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-2"
+          />
+        );
+      case 'color':
+        return (
+          <div className="flex items-center gap-3">
+            <input type="color" value={value} onChange={(e) => handleChange(setting.key, e.target.value)} className="w-10 h-10 rounded-lg border border-zinc-700 cursor-pointer" />
+            <span className="text-sm text-zinc-400">{value}</span>
+          </div>
+        );
+      case 'range':
+        return (
+          <div className="flex items-center gap-4">
+            <input type="range" value={value} onChange={(e) => handleChange(setting.key, parseFloat(e.target.value))} min={setting.min || 0} max={setting.max || 100} step={setting.step || 1} className="flex-1 h-1.5 rounded-lg appearance-none cursor-pointer bg-zinc-700" />
+            <span className="text-sm text-zinc-400 min-w-[40px] text-center">{value}</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`py-2 ${setting.divider ? 'border-b border-zinc-800/50' : ''}`}>
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            {setting.icon && <span className="text-lg">{setting.icon}</span>}
+            <label className="text-sm font-medium text-white">{setting.label}</label>
+            {setting.badge && (
+              <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-500/20 text-blue-400">{setting.badge}</span>
+            )}
+          </div>
+          {setting.description && <p className="text-xs text-zinc-400 mt-0.5">{setting.description}</p>}
+          {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+        </div>
+        <div className="flex-shrink-0 min-w-[120px]">{renderInput()}</div>
+      </div>
+    </div>
+  );
+};
+
+export default SettingsItem;
