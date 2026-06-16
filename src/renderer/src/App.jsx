@@ -53,6 +53,7 @@ function App() {
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
+  const [checking, setChecking] = useState(false);
 
   // Currently active theme ID — loaded from settings.json on mount
   const [activeTheme, setActiveTheme] = useState('zinc');
@@ -148,6 +149,14 @@ function App() {
       shortcut: 'Ctrl+/',
       keywords: ['hotkeys', 'help', 'reference'],
       action: () => setIsCheatsheetOpen((prev) => !prev),
+    },
+    {
+      id: 'update',
+      name: 'Check for Updates',
+      icon: '🔄',
+      description: 'Check and install the latest version',
+      keywords: ['upgrade', 'version', 'release'],
+      action: () => ipcSend('check-for-updates'),
     },
     {
       id: 'sidebar',
