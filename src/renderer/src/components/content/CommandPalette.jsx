@@ -52,7 +52,7 @@ const CommandPalette = ({
   const query = isSpotlight ? search.replace(/^>\s*/, '') : search;
 
   const filterResults = useCallback((q) => {
-    if (!q.trim()) return [];
+    if (!isSpotlight || !q.trim()) return [];
 
     const lower = q.toLowerCase().trim();
     const all = [];
@@ -61,15 +61,13 @@ const CommandPalette = ({
       .filter(c => c.name.toLowerCase().includes(lower) || c.keywords?.some(k => k.includes(lower)))
       .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) })));
 
-    if (isSpotlight) {
-      all.push(...themes
-        .filter(t => t.name.toLowerCase().includes(lower))
-        .map(t => ({ ...t, kind: 'theme', label: t.name, action: () => spotlightExtras.onOpenTheme?.(t.id), score: 5 })));
+    all.push(...themes
+      .filter(t => t.name.toLowerCase().includes(lower))
+      .map(t => ({ ...t, kind: 'theme', label: t.name, action: () => spotlightExtras.onOpenTheme?.(t.id), score: 5 })));
 
-      all.push(...shortcuts
-        .filter(s => s.description.toLowerCase().includes(lower))
-        .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
-    }
+    all.push(...shortcuts
+      .filter(s => s.description.toLowerCase().includes(lower))
+      .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
   }, [isSpotlight, commands, themes, shortcuts, spotlightExtras]);
@@ -166,7 +164,11 @@ const CommandPalette = ({
           </div>
 
           <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
-            {results.length === 0 && query.trim() ? (
+            {!isSpotlight && query.trim() ? (
+              <div className="px-4 py-6 text-center text-white/20">
+                <p className="text-xs">Type <span className="text-white/40">Ctrl+Shift+P</span> or <span className="text-white/40">&gt;</span> to search</p>
+              </div>
+            ) : results.length === 0 && query.trim() ? (
               <div className="px-4 py-6 text-center text-white/20">
                 <p className="text-xs">{emptyMessage}</p>
               </div>
