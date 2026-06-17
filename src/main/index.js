@@ -78,6 +78,7 @@ ipcMain.handle('file-list', () => {
     return fs.readdirSync(docsDir())
       .filter(f => f.endsWith('.md'))
       .map(f => f.replace('.md', ''))
+      .sort((a, b) => a.localeCompare(b))
   } catch { return [] }
 })
 

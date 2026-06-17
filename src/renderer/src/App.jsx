@@ -1,6 +1,6 @@
 import React, { memo, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen, ChevronDown, Trash2, X, Pin, Minimize, TypeOutline, CloudSync, Spotlight, Settings, MessageCircleMore, Heading1 } from 'lucide-react';
+import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen, ChevronDown, Trash2, X, Pin, Minimize, TypeOutline, CloudSync, Spotlight, Settings, MessageCircleMore, Heading1, Pencil } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -62,7 +62,7 @@ const NoteItem = memo(({ note, emoji, isActive, onLoad, onContextMenu }) => (
   </div>
 ));
 
-const NotesSection = memo(({ notes, currentFilename, loadNote, isNotesCollapsed, setIsNotesCollapsed, isDeleteConfirmOpen, setIsDeleteConfirmOpen, setSavedNotes, setIsEmojiModalOpen, iconTargetRef, noteIcons, handleSetIcon }) => {
+const NotesSection = memo(({ notes, currentFilename, loadNote, isNotesCollapsed, setIsNotesCollapsed, isDeleteConfirmOpen, setIsDeleteConfirmOpen, setSavedNotes, setIsEmojiModalOpen, iconTargetRef, noteIcons, handleSetIcon, renameTargetRef, setIsRenameModalOpen }) => {
   const { showContextMenu } = useContextMenu();
 
   if (!notes || notes.length === 0) return null;
@@ -99,6 +99,10 @@ const NotesSection = memo(({ notes, currentFilename, loadNote, isNotesCollapsed,
                       y: e.clientY,
                       items: [
                         { label: 'Open', icon: <FileText className="w-3.5 h-3.5" />, shortcut: 'Enter', action: () => loadNote(note) },
+                        { label: 'Rename', icon: <Pencil className="w-3.5 h-3.5" />, shortcut: 'F2', action: () => {
+                          renameTargetRef.current = note;
+                          setIsRenameModalOpen(true);
+                        } },
                         { type: 'divider' },
                         { label: 'Change Icon', icon: <span className="text-xs">🎨</span>, action: () => {
                           iconTargetRef.current = note;
@@ -112,6 +116,7 @@ const NotesSection = memo(({ notes, currentFilename, loadNote, isNotesCollapsed,
                           if (filename === currentFilename) {
                             setIsDeleteConfirmOpen(true);
                           } else {
+                            handleSetIcon(note, '');
                             window.filesAPI.delete(filename).then(() => {
                               setSavedNotes(p => p.filter(n => n !== note));
                             });
@@ -173,6 +178,8 @@ function App() {
   const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
 
   const iconTargetRef = useRef(null);
+
+  const renameTargetRef = useRef(null);
 
   const [noteIcons, setNoteIcons] = useState({});
 
@@ -262,16 +269,30 @@ function App() {
   }, [editorContent]);
 
   const handleRename = useCallback((newName) => {
-    if (!currentFilename) return;
+    const target = renameTargetRef.current;
+    const oldName = target ? target + '.md' : currentFilename;
+    if (!oldName) return;
     try {
       window.filesAPI.save(newName, editorContent).then((savedName) => {
-        window.filesAPI.delete(currentFilename);
-        setCurrentFilename(savedName);
-        window.workspaceAPI.save({ lastFile: savedName });
+        window.filesAPI.delete(oldName);
+        const nextIcons = { ...noteIcons };
+        if (nextIcons[oldName]) {
+          nextIcons[savedName] = nextIcons[oldName];
+          delete nextIcons[oldName];
+          setNoteIcons(nextIcons);
+          window.workspaceAPI.save({ icons: nextIcons, lastFile: savedName });
+        }
+        if (currentFilename === oldName) {
+          setCurrentFilename(savedName);
+          setEditorContent('');
+          window.filesAPI.read(savedName).then(setEditorContent);
+          window.workspaceAPI.save({ lastFile: savedName });
+        }
+        renameTargetRef.current = null;
         refreshNotes();
       });
     } catch {}
-  }, [currentFilename, editorContent]);
+  }, [currentFilename, editorContent, noteIcons]);
 
   const handleSetIcon = useCallback((noteName, emoji) => {
     const filename = noteName + '.md';
@@ -326,8 +347,11 @@ function App() {
         const idx = savedNotes.indexOf(nameWithoutExt);
         const remaining = savedNotes.filter(n => n !== nameWithoutExt);
         setSavedNotes(remaining);
+        const nextIcons = { ...noteIcons };
+        delete nextIcons[currentFilename];
+        setNoteIcons(nextIcons);
+        window.workspaceAPI.save({ icons: nextIcons, lastFile: remaining.length > 0 ? remaining[0] + '.md' : '' });
 
-        // Jump to closest note, or reset
         if (remaining.length > 0) {
           const next = remaining[Math.min(idx, remaining.length - 1)];
           loadNote(next);
@@ -338,7 +362,7 @@ function App() {
         }
       });
     } catch {}
-  }, [currentFilename, savedNotes, loadNote]);
+  }, [currentFilename, savedNotes, noteIcons, loadNote]);
 
   // Toggle the settings modal — used by the Ctrl+, shortcut
   const toggleSettings = useCallback(() => {
@@ -741,6 +765,8 @@ function App() {
             iconTargetRef={iconTargetRef}
             noteIcons={noteIcons}
             handleSetIcon={handleSetIcon}
+            renameTargetRef={renameTargetRef}
+            setIsRenameModalOpen={setIsRenameModalOpen}
           />
         </div>
 
@@ -842,9 +868,9 @@ function App() {
 
       <RenameModal
         isOpen={isRenameModalOpen}
-        onClose={() => setIsRenameModalOpen(false)}
+        onClose={() => { setIsRenameModalOpen(false); renameTargetRef.current = null; }}
         onRename={handleRename}
-        currentName={currentFilename || ''}
+        currentName={renameTargetRef.current ? renameTargetRef.current + '.md' : (currentFilename || '')}
       />
 
       <EmojiModal
