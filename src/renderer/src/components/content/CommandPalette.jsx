@@ -63,17 +63,12 @@ const CommandPalette = ({
     const lower = q.toLowerCase().trim();
     const all = [];
 
-    const filteredCommands = commands
-      .filter(c => c.name.toLowerCase().includes(lower) || c.keywords?.some(k => k.includes(lower)))
-      .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) }));
-    all.push(...filteredCommands);
-
-    const notes = spotlightExtras.notes || [];
-    all.push(...notes
-      .filter(n => n.toLowerCase().includes(lower))
-      .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
-
     if (isSpotlight) {
+      const filteredCommands = commands
+        .filter(c => c.name.toLowerCase().includes(lower) || c.keywords?.some(k => k.includes(lower)))
+        .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) }));
+      all.push(...filteredCommands);
+
       const t = themesRef.current;
       all.push(...t
         .filter(t => t.name.toLowerCase().includes(lower))
@@ -84,6 +79,11 @@ const CommandPalette = ({
         .filter(s => s.description.toLowerCase().includes(lower))
         .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
     }
+
+    const notes = spotlightExtras.notes || [];
+    all.push(...notes
+      .filter(n => n.toLowerCase().includes(lower))
+      .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
   }, [isSpotlight, commands, spotlightExtras]);
@@ -169,7 +169,7 @@ const CommandPalette = ({
               type="text"
               value={search}
               onChange={(e) => handleChange(e.target.value)}
-              placeholder={isSpotlight ? 'Search anything...' : placeholder}
+              placeholder={isSpotlight ? 'Search anything...' : 'Search notes...'}
               className={`w-full pl-9 pr-3 py-2 text-xs ${style.text} bg-transparent border-b border-white/[0.06] outline-none placeholder:text-white/20 leading-none`}
               spellCheck={false}
               autoComplete="off"
@@ -182,7 +182,7 @@ const CommandPalette = ({
           <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
             {!isSpotlight && !query.trim() ? (
               <div className="px-4 py-6 text-center text-white/20">
-                <p className="text-xs">Type to search notes, or <span className="text-white/40">&gt;</span> for more</p>
+                <p className="text-xs">Type to search notes from your vault</p>
               </div>
             ) : !isSpotlight && query.trim() && results.length === 0 ? (
               <div className="px-4 py-6 text-center text-white/20">
@@ -225,7 +225,7 @@ const CommandPalette = ({
 
           <div className="flex items-center justify-between px-4 py-1.5 border-t border-white/[0.04]">
             <span className="text-[9px] text-white/15">
-              {results.length > 0 ? `${results.length} ${isSpotlight ? 'results' : 'commands'}` : isSpotlight ? 'Search anything' : 'Type > for more'}
+              {results.length > 0 ? `${results.length} ${isSpotlight ? 'results' : 'notes'}` : isSpotlight ? 'Search anything' : 'Search your vault notes'}
             </span>
             <span className="text-[9px] text-white/10">↑↓ Enter Esc</span>
           </div>
