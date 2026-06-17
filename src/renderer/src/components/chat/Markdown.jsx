@@ -105,12 +105,12 @@ const Markdown = ({ content, fontSize = 14, fontFamily = '', accentColor = '' })
     <div
       ref={ref}
       className={
-        'prose prose-invert max-w-none leading-relaxed break-words select-text ' +
+        'prose prose-invert max-w-none leading-relaxed break-words select-text dark:prose-invert ' +
         /* Code wrapper */
-        '[&_.cb-wrap]:my-4 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-white/[0.07] [&_.cb-wrap]:bg-black/[0.35] ' +
-        '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3.5 [&_.cb-head]:py-1.5 [&_.cb-head]:bg-white/[0.03] [&_.cb-head]:border-b [&_.cb-head]:border-white/[0.06] ' +
-        '[&_.cb-lang]:text-[9px] [&_.cb-lang]:font-mono [&_.cb-lang]:text-white/25 [&_.cb-lang]:uppercase [&_.cb-lang]:tracking-widest ' +
-        '[&_.cb-btn]:text-[10px] [&_.cb-btn]:text-white/25 [&_.cb-btn]:hover:text-white/60 [&_.cb-btn]:bg-transparent [&_.cb-btn]:border-0 [&_.cb-btn]:cursor-pointer [&_.cb-btn]:transition-colors [&_.cb-btn]:outline-none [&_.cb-btn]:p-0 [&_.cb-btn]:font-sans ' +
+        '[&_.cb-wrap]:my-4 [&_.cb-wrap]:rounded-lg [&_.cb-wrap]:overflow-hidden [&_.cb-wrap]:border [&_.cb-wrap]:border-black/10 dark:[&_.cb-wrap]:border-white/[0.07] [&_.cb-wrap]:bg-black/[0.06] dark:[&_.cb-wrap]:bg-black/[0.35] ' +
+        '[&_.cb-head]:flex [&_.cb-head]:items-center [&_.cb-head]:justify-between [&_.cb-head]:px-3.5 [&_.cb-head]:py-1.5 [&_.cb-head]:bg-black/[0.04] dark:[&_.cb-head]:bg-white/[0.03] [&_.cb-head]:border-b [&_.cb-head]:border-black/10 dark:[&_.cb-head]:border-white/[0.06] ' +
+        '[&_.cb-lang]:text-[9px] [&_.cb-lang]:font-mono [&_.cb-lang]:text-black/30 dark:[&_.cb-lang]:text-white/25 [&_.cb-lang]:uppercase [&_.cb-lang]:tracking-widest ' +
+        '[&_.cb-btn]:text-[10px] [&_.cb-btn]:text-black/30 dark:[&_.cb-btn]:text-white/25 [&_.cb-btn]:hover:text-black/60 dark:[&_.cb-btn]:hover:text-white/60 [&_.cb-btn]:bg-transparent [&_.cb-btn]:border-0 [&_.cb-btn]:cursor-pointer [&_.cb-btn]:transition-colors [&_.cb-btn]:outline-none [&_.cb-btn]:p-0 [&_.cb-btn]:font-sans ' +
         '[&_.cb-wrap_pre]:m-0 [&_.cb-wrap_pre]:bg-transparent [&_.cb-wrap_pre]:px-3.5 [&_.cb-wrap_pre]:py-3 [&_.cb-wrap_pre]:overflow-x-auto ' +
         '[&_.cb-wrap_code]:font-mono [&_.cb-wrap_code]:leading-relaxed [&_.cb-wrap_code]:bg-transparent [&_.cb-wrap_code]:p-0 ' +
         '[&_pre_code]:text-inherit [&_pre_code]:bg-transparent [&_pre_code]:p-0 ' +
@@ -119,23 +119,23 @@ const Markdown = ({ content, fontSize = 14, fontFamily = '', accentColor = '' })
         /* Prose */
         '[&_p]:my-2.5 [&_p]:leading-relaxed ' +
         '[&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-opacity [&_a]:hover:opacity-80 ' +
-        '[&_hr]:border-white/[0.07] [&_hr]:my-4 ' +
+        '[&_hr]:border-black/10 dark:[&_hr]:border-white/[0.07] [&_hr]:my-4 ' +
         '[&_ul]:list-disc [&_ul]:my-2 [&_ul]:pl-5 ' +
         '[&_ol]:list-decimal [&_ol]:my-2 [&_ol]:pl-5 ' +
         '[&_li]:my-1 [&_li]:pl-0.5 [&_li]:leading-relaxed ' +
-        '[&_strong]:font-semibold [&_strong]:text-white/90 ' +
-        '[&_em]:italic [&_em]:text-white/70 ' +
-        '[&_del]:line-through [&_del]:text-white/35 ' +
+        '[&_strong]:font-semibold [&_strong]:text-black/90 dark:[&_strong]:text-white/90 ' +
+        '[&_em]:italic [&_em]:text-black/70 dark:[&_em]:text-white/70 ' +
+        '[&_del]:line-through [&_del]:text-black/35 dark:[&_del]:text-white/35 ' +
         '[&_img]:rounded-lg [&_img]:my-3 [&_img]:max-w-full ' +
-        '[&_h1]:font-bold [&_h1]:text-white/90 [&_h1]:mb-3 [&_h1]:mt-5 [&_h1]:leading-tight [&_h1]:tracking-tight ' +
-        '[&_h2]:font-semibold [&_h2]:text-white/85 [&_h2]:mb-2.5 [&_h2]:mt-4 [&_h2]:leading-tight ' +
-        '[&_h3]:font-semibold [&_h3]:text-white/80 [&_h3]:mb-2 [&_h3]:mt-3 [&_h3]:leading-snug ' +
-        '[&_h4]:font-medium [&_h4]:text-white/75 [&_h4]:mb-1.5 [&_h4]:mt-2.5 ' +
-        '[&_blockquote]:border-l-[3px] [&_blockquote]:border-white/15 [&_blockquote]:pl-4 [&_blockquote]:text-white/50 [&_blockquote]:my-3 [&_blockquote]:italic ' +
-        '[&_table]:w-full [&_table]:text-left [&_table]:my-3 [&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-lg [&_table]:overflow-hidden [&_table]:border [&_table]:border-white/[0.06] ' +
-        '[&_th]:bg-white/[0.04] [&_th]:border-b [&_th]:border-white/[0.06] [&_th]:px-3.5 [&_th]:py-2 [&_th]:text-white/55 [&_th]:font-semibold [&_th]:text-left [&_th]:uppercase [&_th]:tracking-wider ' +
-        '[&_td]:border-b [&_td]:border-white/[0.04] [&_td]:px-3.5 [&_td]:py-2 ' +
-        '[&_tbody_tr:nth-child(even)_td]:bg-white/[0.015] ' +
+        '[&_h1]:font-bold [&_h1]:text-black/90 dark:[&_h1]:text-white/90 [&_h1]:mb-3 [&_h1]:mt-5 [&_h1]:leading-tight [&_h1]:tracking-tight ' +
+        '[&_h2]:font-semibold [&_h2]:text-black/85 dark:[&_h2]:text-white/85 [&_h2]:mb-2.5 [&_h2]:mt-4 [&_h2]:leading-tight ' +
+        '[&_h3]:font-semibold [&_h3]:text-black/80 dark:[&_h3]:text-white/80 [&_h3]:mb-2 [&_h3]:mt-3 [&_h3]:leading-snug ' +
+        '[&_h4]:font-medium [&_h4]:text-black/75 dark:[&_h4]:text-white/75 [&_h4]:mb-1.5 [&_h4]:mt-2.5 ' +
+        '[&_blockquote]:border-l-[3px] [&_blockquote]:border-black/15 dark:[&_blockquote]:border-white/15 [&_blockquote]:pl-4 [&_blockquote]:text-black/50 dark:[&_blockquote]:text-white/50 [&_blockquote]:my-3 [&_blockquote]:italic ' +
+        '[&_table]:w-full [&_table]:text-left [&_table]:my-3 [&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-lg [&_table]:overflow-hidden [&_table]:border [&_table]:border-black/10 dark:[&_table]:border-white/[0.06] ' +
+        '[&_th]:bg-black/[0.04] dark:[&_th]:bg-white/[0.04] [&_th]:border-b [&_th]:border-black/10 dark:[&_th]:border-white/[0.06] [&_th]:px-3.5 [&_th]:py-2 [&_th]:text-black/55 dark:[&_th]:text-white/55 [&_th]:font-semibold [&_th]:text-left [&_th]:uppercase [&_th]:tracking-wider ' +
+        '[&_td]:border-b [&_td]:border-black/[0.04] dark:[&_td]:border-white/[0.04] [&_td]:px-3.5 [&_td]:py-2 ' +
+        '[&_tbody_tr:nth-child(even)_td]:bg-black/[0.015] dark:[&_tbody_tr:nth-child(even)_td]:bg-white/[0.015] ' +
         '[&_tr:last-child_td]:border-b-0'
       }
       style={{

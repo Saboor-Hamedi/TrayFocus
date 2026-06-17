@@ -13,8 +13,8 @@ const ScrollButton = ({ onClick }) => (
   <button
     onClick={onClick}
     className="absolute bottom-2 right-3 z-10 flex items-center justify-center
-      w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 border border-white/10
-      text-white/40 hover:text-white/70 transition-all duration-150 shadow-md"
+      w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 border border-black/10 dark:border-white/10
+      text-black/40 dark:text-white/40 hover:text-black/70 dark:hover:text-white/70 transition-all duration-150 shadow-md"
     title="Scroll to bottom"
   >
     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -26,13 +26,13 @@ const ScrollButton = ({ onClick }) => (
 /* ── Empty state ─────────────────────────────────────── */
 const EmptyState = ({ providerName }) => (
   <div className="flex flex-col items-center justify-center h-full text-center px-8 select-none">
-    <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-4 shadow-inner">
-      <Bot className="w-5 h-5 text-white/20" strokeWidth={1.5} />
+    <div className="w-10 h-10 rounded-2xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.06] flex items-center justify-center mb-4 shadow-inner">
+      <Bot className="w-5 h-5 text-black/20 dark:text-white/20" strokeWidth={1.5} />
     </div>
-    <p className="text-[12px] font-medium text-white/30 mb-1">
+    <p className="text-[12px] font-medium text-black/30 dark:text-white/30 mb-1">
       Ask {providerName} anything
     </p>
-    <p className="text-[10px] text-white/15 leading-relaxed max-w-[180px]">
+    <p className="text-[10px] text-black/15 dark:text-white/15 leading-relaxed max-w-[180px]">
       API keys are stored locally and never leave your device
     </p>
   </div>
@@ -41,9 +41,9 @@ const EmptyState = ({ providerName }) => (
 /* ── Date / session divider ──────────────────────────── */
 const SessionDivider = () => (
   <div className="flex items-center gap-3 px-4 py-2">
-    <div className="flex-1 h-px bg-white/[0.05]" />
-    <span className="text-[9px] text-white/15 select-none">New session</span>
-    <div className="flex-1 h-px bg-white/[0.05]" />
+    <div className="flex-1 h-px bg-black/[0.05] dark:bg-white/[0.05]" />
+    <span className="text-[9px] text-black/15 dark:text-white/15 select-none">New session</span>
+    <div className="flex-1 h-px bg-black/[0.05] dark:bg-white/[0.05]" />
   </div>
 );
 
@@ -140,12 +140,12 @@ const ChatPanel = ({ apiKey, providerId, model, fontSize = 14, accentColor = '' 
       <div className="flex flex-col h-full w-full max-w-xl overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-3.5 py-2 border-b border-white/[0.05] shrink-0">
+        <div className="flex items-center justify-between px-3.5 py-2 border-b border-black/[0.05] dark:border-white/[0.05] shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-md bg-blue-500/15 flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-blue-400" strokeWidth={1.5} />
             </div>
-            <span className="text-[11px] font-medium text-white/50 tracking-wide">{providerName}</span>
+            <span className="text-[11px] font-medium text-black/50 dark:text-white/50 tracking-wide">{providerName}</span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -157,7 +157,7 @@ const ChatPanel = ({ apiKey, providerId, model, fontSize = 14, accentColor = '' 
               <button
                 onClick={handleClear}
                 className="size-6 flex items-center justify-center rounded-md
-                  text-white/20 hover:text-white/50 hover:bg-white/[0.06]
+                  text-black/20 dark:text-white/20 hover:text-black/50 dark:hover:text-white/50 hover:bg-black/[0.06] dark:hover:bg-white/[0.06]
                   transition-all duration-150"
                 title="Clear conversation"
               >
@@ -172,7 +172,7 @@ const ChatPanel = ({ apiKey, providerId, model, fontSize = 14, accentColor = '' 
           <div
             ref={scrollRef}
             className="h-full overflow-y-auto py-3 scroll-smooth"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.06) transparent' }}
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,0,0,0.06) transparent' }}
           >
             {messages.length === 0 ? (
               <EmptyState providerName={providerName} />
