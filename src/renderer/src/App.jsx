@@ -312,6 +312,7 @@ function App() {
     textMuted: 'text-zinc-400',
     hover: 'hover:bg-zinc-800/50',
     active: `${accentClass} bg-zinc-800/50`,
+    activeBorder: accentClass.replace('text-', 'border-'),
     input: 'bg-zinc-800/50 border-zinc-700 text-white',
     inputFocus: 'border-zinc-500',
     scrollbar: 'scrollbar-thumb-zinc-700',

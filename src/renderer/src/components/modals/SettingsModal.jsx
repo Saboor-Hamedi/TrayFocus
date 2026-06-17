@@ -291,7 +291,7 @@ export const SettingsModal = ({
                     onClick={() => setActiveCategory(category.id)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs transition-all ${
                       activeCategory === category.id
-                        ? `${style.active} border-r-2 border-blue-500`
+                        ? `${style.active} border-r-2 ${style.activeBorder}`
                         : `${style.textMuted} ${style.hover}`
                     }`}
                   >
