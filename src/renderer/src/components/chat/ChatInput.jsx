@@ -118,7 +118,7 @@ const ChatInput = ({ onSend, onStop, loading, disabled, placeholder = 'Message..
   const hasText = value.trim().length > 0;
 
   return (
-    <div className="shrink-0 px-3 pb-3 pt-2 border-t border-black/[0.05] dark:border-white/[0.05]">
+    <div className="shrink-0 px-3 pb-3 pt-2">
       <div className="max-w-xl mx-auto">
         <div
           className="flex flex-col rounded-xl overflow-hidden border transition-all duration-200

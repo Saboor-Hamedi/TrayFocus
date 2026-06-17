@@ -236,7 +236,7 @@ export const SidebarItem = memo(({
 
         {/* Label */}
         {(isExpanded || !collapsed) && (
-          <span className="text-sm font-medium truncate flex-1 text-left">
+          <span className="text-sm truncate flex-1 text-left">
             {label}
           </span>
         )}

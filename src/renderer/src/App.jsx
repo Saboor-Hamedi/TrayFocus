@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { House, Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText } from 'lucide-react';
+import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -13,6 +13,7 @@ import MarkdownEditor from './components/chat/MarkdownEditor';
 import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
+import RightSidebar from './components/sidebar/right/RightSidebar';
 import { getTheme, getThemeClass } from './theme';
 import { register, startListening, stopListening } from './utils/ShortcutManager';
 import * as settings from './utils/settingsManager';
@@ -49,6 +50,12 @@ function App() {
   // Whether the sidebar is open or closed
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Whether the left document outline sidebar is open or closed
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+
+  // Current markdown editor content (for RightSidebar stats)
+  const [editorContent, setEditorContent] = useState('');
+
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
@@ -83,6 +90,14 @@ function App() {
       setSettingsLoaded(true);
     });
   }, []);
+
+  // Toggle `dark` class on <html> for Tailwind `dark:` variant.
+  // Only the GitHub light theme disables dark mode; every other theme is dark.
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    const isDark = activeTheme !== 'github';
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [activeTheme, settingsLoaded]);
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -138,6 +153,11 @@ function App() {
     setIsSidebarOpen((prev) => !prev);
   }, []);
 
+  // Toggle the right outline sidebar — used by Ctrl+Shift+B
+  const toggleRightSidebar = useCallback(() => {
+    setIsRightSidebarOpen((prev) => !prev);
+  }, []);
+
   // Toggle the settings modal — used by the Ctrl+, shortcut
   const toggleSettings = useCallback(() => {
     setIsSettingsModalOpen((prev) => !prev);
@@ -153,14 +173,6 @@ function App() {
       description: 'Switch to the Chat page',
       keywords: ['ai', 'assistant', 'gpt'],
       action: () => setActivePage('chat'),
-    },
-    {
-      id: 'nav-home',
-      name: 'Home',
-      icon: '🏠',
-      description: 'Switch to the Home page',
-      keywords: ['dashboard', 'main'],
-      action: () => setActivePage('home'),
     },
     {
       id: 'nav-markdown',
@@ -215,13 +227,13 @@ function App() {
       action: () => setIsSidebarOpen((prev) => !prev),
     },
     {
-      id: 'theme',
-      name: 'Change Theme',
-      icon: '🎨',
-      description: 'Pick a color theme for the app',
-      shortcut: 'Ctrl+T',
-      keywords: ['color', 'appearance', 'dark', 'light'],
-      action: () => setIsThemeModalOpen(true),
+      id: 'outline',
+      name: 'Toggle Outline Panel',
+      icon: '📊',
+      description: 'Open or close the document outline & stats panel',
+      shortcut: 'Ctrl+Shift+B',
+      keywords: ['stats', 'tags', 'mentions', 'outline'],
+      action: () => setIsRightSidebarOpen((prev) => !prev),
     },
     {
       id: 'minimize',
@@ -278,6 +290,14 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+Shift+B toggles the left outline sidebar
+    const unregisterRightSidebar = register('b', toggleRightSidebar, {
+      ctrl: true,
+      shift: true,
+      description: 'Toggle outline panel',
+      priority: 10,
+    });
+
     // Ctrl+, opens the settings modal
     const unregisterSettings = register(',', toggleSettings, {
       ctrl: true,
@@ -312,13 +332,14 @@ function App() {
       unregisterTheme();
       unregisterPalette();
       unregisterSidebar();
+      unregisterRightSidebar();
       unregisterSettings();
       unregisterPin();
       unregisterCheatsheet();
       unregisterSpotlight();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleRightSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -397,15 +418,27 @@ function App() {
           accentColor={accentClass}
         />
       ) : activePage === 'markdown' ? (
-        <MarkdownEditor
-          fontSize={settingsValues.fontSize || 14}
-          cursorStyle={settingsValues.cursorStyle || 'bar'}
-          cursorWidth={settingsValues.cursorWidth || 2}
-          wrapLines={settingsValues.editorWrapLines ?? true}
-          showLineNumbers={settingsValues.editorLineNumbers ?? true}
-          isLightTheme={getTheme(activeTheme)?.bg?.includes('#ffffff') || getTheme(activeTheme)?.bg === 'bg-white'}
-          accentColor={accentClass}
-        />
+        <div className="flex h-full">
+          <div className="flex-1 min-w-0 h-full">
+            <MarkdownEditor
+              value={editorContent}
+              onChange={setEditorContent}
+              fontSize={settingsValues.fontSize || 14}
+              cursorStyle={settingsValues.cursorStyle || 'bar'}
+              cursorWidth={settingsValues.cursorWidth || 2}
+              wrapLines={settingsValues.editorWrapLines ?? true}
+              showLineNumbers={settingsValues.editorLineNumbers ?? true}
+              isLightTheme={getTheme(activeTheme)?.bg?.includes('#ffffff') || getTheme(activeTheme)?.bg === 'bg-white'}
+              accentColor={accentClass}
+            />
+          </div>
+          <RightSidebar
+            isOpen={isRightSidebarOpen}
+            onClose={() => setIsRightSidebarOpen(false)}
+            content={editorContent}
+            accentColor={accentClass}
+          />
+        </div>
       ) : (
       <main className="flex-1" />
       )}
@@ -424,6 +457,7 @@ function App() {
         closeOnOverlayClick={false}
       >
         <SidebarHeader
+          icon={<Zap className="w-4 h-4" strokeWidth={1.5} />}
           title="TrayFocus"
           subtitle={`v${pkg.version}`}
         />
@@ -431,32 +465,16 @@ function App() {
         <div className="flex-1 overflow-y-auto">
           <SidebarGroup label="Main">
             <SidebarItem
-              icon={<MessageCircle className="w-4 h-4" strokeWidth={1.5} />}
-              label="Chat"
+              icon={<div className="w-5 h-5 rounded bg-blue-500/15 flex items-center justify-center"><MessageCircle className="w-3 h-3 text-blue-400" strokeWidth={2} /></div>}
+              label="AI Chat"
               active={activePage === 'chat'}
               onClick={() => setActivePage('chat')}
             />
             <SidebarItem
-              icon={<House className="w-4 h-4" strokeWidth={1.5} />}
-              label="Home"
-              active={activePage === 'home' && !isThemeModalOpen && !isSettingsModalOpen}
-              onClick={() => setActivePage('home')}
-            />
-            <SidebarItem
-              icon={<FileText className="w-4 h-4" strokeWidth={1.5} />}
-              label="Markdown"
+              icon={<div className="w-5 h-5 rounded bg-emerald-500/15 flex items-center justify-center"><FileText className="w-3 h-3 text-emerald-400" strokeWidth={2} /></div>}
+              label="Markdown Editor"
               active={activePage === 'markdown'}
               onClick={() => setActivePage('markdown')}
-            />
-          </SidebarGroup>
-
-          <SidebarGroup label="Appearance">
-            <SidebarItem
-              icon={<Palette className="w-4 h-4" strokeWidth={1.5} />}
-              label="Theme"
-              shortcut="Ctrl+T"
-              active={isThemeModalOpen}
-              onClick={() => { setIsThemeModalOpen(true); }}
             />
           </SidebarGroup>
 
@@ -464,7 +482,7 @@ function App() {
 
         <SidebarDivider />
         <SidebarItem
-          icon={<Cog className="w-4 h-4" strokeWidth={1.5} />}
+          icon={<div className="w-5 h-5 rounded bg-amber-500/15 flex items-center justify-center"><Cog className="w-3 h-3 text-amber-400" strokeWidth={2} /></div>}
           label="Settings"
           shortcut="Ctrl+,"
           active={isSettingsModalOpen}

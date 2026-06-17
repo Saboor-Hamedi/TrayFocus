@@ -31,28 +31,34 @@ const injectGlobalStyles = () => {
     /* ── Headings ───────────────────────────────────────────── */
     .md-prose h1,.md-prose h2,.md-prose h3,
     .md-prose h4,.md-prose h5,.md-prose h6 {
-      font-weight: 600; line-height: 1.25; color: rgba(255,255,255,0.9);
+      font-weight: 600; line-height: 1.25; color: rgba(0,0,0,0.85);
       letter-spacing: -0.01em;
     }
     .md-prose h1 {
       font-size: var(--md-h1, 1.6em); font-weight: 700;
       margin: 1.1em 0 0.45em;
       padding-bottom: 0.3em;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
       letter-spacing: -0.02em;
     }
     .md-prose h2 {
       font-size: var(--md-h2, 1.35em); font-weight: 700;
       margin: 0.95em 0 0.38em;
       padding-bottom: 0.22em;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
     .md-prose h3 { font-size: var(--md-h3, 1.15em); margin: 0.8em 0 0.3em; }
-    .md-prose h4 { font-size: 1em; margin: 0.65em 0 0.25em; color: rgba(255,255,255,0.8); }
+    .md-prose h4 { font-size: 1em; margin: 0.65em 0 0.25em; color: rgba(0,0,0,0.75); }
     .md-prose h5,.md-prose h6 {
       font-size: 0.95em; font-weight: 500;
-      margin: 0.55em 0 0.2em; color: rgba(255,255,255,0.65);
+      margin: 0.55em 0 0.2em; color: rgba(0,0,0,0.55);
     }
+
+    .dark .md-prose h1,.dark .md-prose h2,.dark .md-prose h3 { color: rgba(255,255,255,0.9); }
+    .dark .md-prose h1 { border-bottom-color: rgba(255,255,255,0.07); }
+    .dark .md-prose h2 { border-bottom-color: rgba(255,255,255,0.05); }
+    .dark .md-prose h4 { color: rgba(255,255,255,0.8); }
+    .dark .md-prose h5,.dark .md-prose h6 { color: rgba(255,255,255,0.65); }
 
     /* ── Links ──────────────────────────────────────────────── */
     .md-prose a {
@@ -64,17 +70,21 @@ const injectGlobalStyles = () => {
     }
     .md-prose a:hover { opacity: 0.75; }
 
-    /* ── HR ───────────────────────────────────────────────────    /* Horizontal rule */
+    /* ── HR ─────────────────────────────────────────────────── */
     .md-prose hr {
       border: 0;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      border-top: 1px solid rgba(0,0,0,0.1);
       margin: 1em 0;
     }
+    .dark .md-prose hr { border-top-color: rgba(255,255,255,0.07); }
 
     /* ── Inline formatting ──────────────────────────────────── */
-    .md-prose strong { font-weight: 700; color: rgba(255,255,255,0.92); }
-    .md-prose em { font-style: italic; color: rgba(255,255,255,0.72); }
-    .md-prose del { text-decoration: line-through; color: rgba(255,255,255,0.35); }
+    .md-prose strong { font-weight: 700; color: rgba(0,0,0,0.9); }
+    .md-prose em { font-style: italic; color: rgba(0,0,0,0.65); }
+    .md-prose del { text-decoration: line-through; color: rgba(0,0,0,0.35); }
+    .dark .md-prose strong { color: rgba(255,255,255,0.92); }
+    .dark .md-prose em { color: rgba(255,255,255,0.72); }
+    .dark .md-prose del { color: rgba(255,255,255,0.35); }
 
     /* ── Tags & mentions ─────────────────────────────────────── */
     .md-prose .md-tag,
@@ -91,8 +101,11 @@ const injectGlobalStyles = () => {
       padding: 0.18em 0.45em;
       border-radius: 4px;
       color: var(--md-accent, #60a5fa);
-      background: color-mix(in srgb, var(--md-accent, #60a5fa) 12%, transparent);
+      background: color-mix(in srgb, var(--md-accent, #60a5fa) 8%, transparent);
       font-weight: 500;
+    }
+    .dark .md-prose :not(pre) > code {
+      background: color-mix(in srgb, var(--md-accent, #60a5fa) 12%, transparent);
     }
 
     /* ── Blockquote ─────────────────────────────────────────── */
@@ -102,9 +115,10 @@ const injectGlobalStyles = () => {
       border-left: 3px solid color-mix(in srgb, var(--md-accent, #60a5fa) 40%, transparent);
       background: color-mix(in srgb, var(--md-accent, #60a5fa) 5%, transparent);
       border-radius: 0 6px 6px 0;
-      color: rgba(255,255,255,0.52);
+      color: rgba(0,0,0,0.6);
       font-style: italic;
     }
+    .dark .md-prose blockquote { color: rgba(255,255,255,0.52); }
     .md-prose blockquote p { margin: 0; }
     .md-prose blockquote > *:first-child { margin-top: 0; }
     .md-prose blockquote > *:last-child  { margin-bottom: 0; }
@@ -114,31 +128,25 @@ const injectGlobalStyles = () => {
       margin: 0.5em 0;
       padding-left: 1.6em;
     }
-    /* Nested lists closer together */
     .md-prose li > ul, .md-prose li > ol { margin: 0.18em 0; }
 
-    /* Bullet levels */
     .md-prose ul                { list-style-type: disc; }
     .md-prose ul ul             { list-style-type: circle; }
     .md-prose ul ul ul          { list-style-type: square; }
 
-    /* Ordered levels */
     .md-prose ol                { list-style-type: decimal; }
     .md-prose ol ol             { list-style-type: lower-alpha; }
     .md-prose ol ol ol          { list-style-type: lower-roman; }
 
-    /* List items */
     .md-prose li {
       margin: 0.28em 0;
       padding-left: 0.25em;
       line-height: 1.7;
     }
-    /* Accent-colored markers */
     .md-prose li::marker {
       color: var(--md-accent, #60a5fa);
       opacity: 0.65;
     }
-    /* Loose list paragraph spacing */
     .md-prose li > p { margin: 0.2em 0; }
 
     /* ── Task lists ──────────────────────────────────────────── */
@@ -147,17 +155,15 @@ const injectGlobalStyles = () => {
       display: flex;
       align-items: flex-start;
       gap: 0.55em;
-      margin-left: -1.6em;    /* pull back to align with regular items */
+      margin-left: -1.6em;
       padding-left: 0;
     }
     .md-prose li.md-task .md-cb {
       flex-shrink: 0;
       width:  0.95em;
       height: 0.95em;
-      border: 1.5px solid rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(0,0,0,0.2);
       border-radius: 3px;
-      /* Center the box with the first line of text:
-         line-height=1.7, box=0.95em → top = (1.7-0.95)/2 = 0.375em */
       margin-top: 0.375em;
       display: inline-flex;
       align-items: center;
@@ -167,6 +173,7 @@ const injectGlobalStyles = () => {
       color: transparent;
       transition: background 0.15s, border-color 0.15s;
     }
+    .dark .md-prose li.md-task .md-cb { border-color: rgba(255,255,255,0.22); }
     .md-prose li.md-task.md-checked .md-cb {
       background: var(--md-accent, #60a5fa);
       border-color: var(--md-accent, #60a5fa);
@@ -182,24 +189,28 @@ const injectGlobalStyles = () => {
     .md-prose table {
       width: 100%; border-collapse: separate; border-spacing: 0;
       margin: 0.8em 0;
-      border: 1px solid rgba(255,255,255,0.07);
+      border: 1px solid rgba(0,0,0,0.1);
       border-radius: 8px; overflow: hidden;
       font-size: 0.92em;
     }
+    .dark .md-prose table { border-color: rgba(255,255,255,0.07); }
     .md-prose th {
-      background: rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.04);
       padding: 0.5em 0.9em;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
       font-size: 0.78em; text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.5); font-weight: 600; text-align: left;
+      color: rgba(0,0,0,0.5); font-weight: 600; text-align: left;
     }
+    .dark .md-prose th { background: rgba(255,255,255,0.04); border-bottom-color: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
     .md-prose td {
       padding: 0.45em 0.9em;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
     }
+    .dark .md-prose td { border-bottom-color: rgba(255,255,255,0.04); }
     .md-prose tr:last-child td { border-bottom: 0; }
-    .md-prose tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+    .md-prose tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
+    .dark .md-prose tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
 
     /* ── Images ──────────────────────────────────────────────── */
     .md-prose img { max-width: 100%; border-radius: 8px; margin: 0.5em 0; }
@@ -208,27 +219,32 @@ const injectGlobalStyles = () => {
     .md-prose .cb-wrap {
       margin: 0.9em 0;
       border-radius: 8px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.32);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.04);
     }
+    .dark .md-prose .cb-wrap { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.32); }
     .md-prose .cb-head {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0.32em 0.9em;
-      background: rgba(255,255,255,0.03);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.03);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
+    .dark .md-prose .cb-head { background: rgba(255,255,255,0.03); border-bottom-color: rgba(255,255,255,0.06); }
     .md-prose .cb-lang {
       font-family: ui-monospace, monospace; font-size: 0.68em;
       text-transform: uppercase; letter-spacing: 0.09em;
-      color: rgba(255,255,255,0.24);
+      color: rgba(0,0,0,0.4);
     }
+    .dark .md-prose .cb-lang { color: rgba(255,255,255,0.24); }
     .md-prose .cb-btn {
-      font-size: 0.7em; color: rgba(255,255,255,0.24);
+      font-size: 0.7em; color: rgba(0,0,0,0.4);
       background: transparent; border: 0; cursor: pointer;
       padding: 0; font-family: inherit;
       transition: color 0.15s;
     }
-    .md-prose .cb-btn:hover { color: rgba(255,255,255,0.6); }
+    .dark .md-prose .cb-btn { color: rgba(255,255,255,0.24); }
+    .md-prose .cb-btn:hover { color: rgba(0,0,0,0.6); }
+    .dark .md-prose .cb-btn:hover { color: rgba(255,255,255,0.6); }
     .md-prose .cb-wrap pre {
       margin: 0; background: transparent;
       padding: 0.875em 0.9em; overflow-x: auto;

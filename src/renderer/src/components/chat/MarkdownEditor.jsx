@@ -378,25 +378,25 @@ const MarkdownEditor = ({
 
   return (
     <div
-      className="flex flex-col h-full border-y border-r border-white/[0.06] rounded-xl overflow-hidden"
+      className="flex flex-col h-full border-y border-r border-black/[0.06] dark:border-white/[0.06] overflow-hidden"
       ref={containerRef}
     >
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-white/[0.05] bg-white/[0.02] shrink-0 [app-region:no-drag]">
+      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-black/10 dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02] shrink-0 [app-region:no-drag]">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-medium text-white/30 tracking-wide">Markdown</span>
+          <span className="text-[10px] font-medium text-black/40 dark:text-white/30 tracking-wide">Markdown</span>
           {preview && (
-            <span className="text-[9px] text-white/15 border border-white/[0.06] rounded px-1 py-px">split</span>
+            <span className="text-[9px] text-black/20 dark:text-white/15 border border-black/10 dark:border-white/[0.06] rounded px-1 py-px">split</span>
           )}
         </div>
         <div className="flex items-center gap-1.5">
-          <kbd className="text-[9px] text-white/15 font-mono bg-white/[0.04] px-1 py-px rounded border border-white/[0.06]">
+          <kbd className="text-[9px] text-black/20 dark:text-white/15 font-mono bg-black/[0.04] dark:bg-white/[0.04] px-1 py-px rounded border border-black/10 dark:border-white/[0.06]">
             Ctrl+\
           </kbd>
           <button
             onClick={togglePreview}
             className={`size-6 flex items-center justify-center rounded transition-colors
-              ${preview ? 'text-blue-400/70 bg-blue-400/10' : 'text-white/25 hover:text-white/50 hover:bg-white/[0.05]'}`}
+              ${preview ? 'text-blue-400/70 bg-blue-400/10' : 'text-black/25 dark:text-white/25 hover:text-black/50 dark:hover:text-white/50 hover:bg-black/5 dark:hover:bg-white/[0.05]'}`}
             title={preview ? 'Hide preview (Ctrl+\\)' : 'Show preview (Ctrl+\\)'}
           >
             {preview ? <Code2 className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
@@ -416,19 +416,19 @@ const MarkdownEditor = ({
         {preview && (
           <>
             <div
-              className="w-[5px] flex-shrink-0 cursor-col-resize flex items-center justify-center group hover:bg-white/[0.04] transition-colors border-x border-white/[0.05]"
+              className="w-[5px] flex-shrink-0 cursor-col-resize flex items-center justify-center group hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors border-x border-black/[0.06] dark:border-white/[0.05]"
               onMouseDown={handleMouseDown}
             >
-              <GripVertical className="w-2.5 h-2.5 text-white/10 group-hover:text-white/30 transition-colors" />
+              <GripVertical className="w-2.5 h-2.5 text-black/10 dark:text-white/10 group-hover:text-black/30 dark:group-hover:text-white/30 transition-colors" />
             </div>
             <div
               className="overflow-y-auto select-text"
-              style={{ width: previewW, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.07) transparent' }}
+              style={{ width: previewW, scrollbarWidth: 'thin', scrollbarColor: 'rgba(127,127,127,0.15) transparent' }}
             >
               <div className="px-4 py-4">
                 {content
                   ? <Markdown content={content} fontSize={fontSize} fontFamily={fontFamily} accentColor={accentColor} />
-                  : <p className="text-xs text-white/15 italic">Nothing to preview…</p>
+                   : <p className="text-xs text-black/20 dark:text-white/15 italic">Nothing to preview…</p>
                 }
               </div>
             </div>
