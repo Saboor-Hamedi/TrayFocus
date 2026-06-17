@@ -321,14 +321,14 @@ function App() {
 
   const sidebarStyle = useMemo(() => ({
     bg: theme.bg,
-    border: 'border-white/10',
+    border: 'border-black/10 dark:border-white/10',
     text: theme.text,
-    textMuted: 'text-white/40',
-    hover: 'hover:bg-white/5',
-    active: `${accentClass} bg-white/10`,
-    activeBg: 'bg-white/5',
-    divider: 'border-white/10',
-    scrollbar: 'scrollbar-thumb-zinc-700',
+    textMuted: 'text-black/40 dark:text-white/40',
+    hover: 'hover:bg-black/5 dark:hover:bg-white/5',
+    active: `${accentClass} bg-black/5 dark:bg-white/10`,
+    activeBg: 'bg-black/5 dark:bg-white/5',
+    divider: 'border-black/10 dark:border-white/10',
+    scrollbar: 'scrollbar-thumb-black/10 dark:scrollbar-thumb-zinc-700',
     shadow: 'shadow-2xl',
   }), [theme, accentClass]);
 
