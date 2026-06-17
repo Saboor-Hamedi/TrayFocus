@@ -26,6 +26,8 @@ const buildTheme = (fs) => EditorView.theme({
     fontFamily: 'ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace',
     caretColor: '#60a5fa',
     lineHeight: '1.65',
+    whiteSpace: 'pre',
+    overflowWrap: 'normal',
   },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.025)' },
   '.cm-activeLineGutter': { background: 'rgba(255,255,255,0.02)' },
@@ -217,7 +219,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
         {/* CodeMirror editor */}
         <div
           ref={editorRef}
-          className="overflow-hidden"
+          className="overflow-auto"
           style={{ width: editorW, fontFamily: fontFamily || undefined }}
         />
 
