@@ -33,12 +33,11 @@ const buildTheme = (fs) => EditorView.theme({
   '.cm-gutters': {
     background: 'rgba(255,255,255,0.015)',
     border: 'none',
-    borderRight: '1px solid rgba(255,255,255,0.05)',
     color: 'rgba(255,255,255,0.18)',
     fontSize: `${Math.max(fs * 0.78, 9)}px`,
-    paddingRight: '8px',
+    paddingRight: '4px',
   },
-  '.cm-lineNumbers .cm-gutterElement': { minWidth: '32px', textAlign: 'right' },
+  '.cm-lineNumbers .cm-gutterElement': { minWidth: '24px', textAlign: 'right' },
   '.cm-cursor': { borderLeftColor: '#60a5fa' },
   '.cm-focused': { outline: 'none' },
   '.cm-scroller': { overflow: 'auto' },
@@ -146,7 +145,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
     return () => { viewRef.current?.destroy(); viewRef.current = null; };
   }, []); // eslint-disable-line
 
-  /* ✅ Key fix: dynamically reconfigure the theme when fontSize changes */
+  /*  Key fix: dynamically reconfigure the theme when fontSize changes */
   useEffect(() => {
     if (!viewRef.current) return;
     viewRef.current.dispatch({
@@ -241,7 +240,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
                 scrollbarColor: 'rgba(255,255,255,0.07) transparent',
               }}
             >
-              <div className="px-3 py-3">
+              <div className="px-2">
                 {content
                   ? <Markdown
                       content={content}
