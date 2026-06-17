@@ -1,6 +1,5 @@
 // Renderer-side settings manager — communicates with main process via
-// window.settingsAPI (exposed by preload) to read/write settings.json
-// in AppData/trayfocus/
+// window.electron.ipcRenderer to read/write settings.json in AppData/trayfocus/
 
 const defaults = {
   theme: 'zinc',
@@ -24,16 +23,16 @@ const defaults = {
 
 let cache = null;
 
-function api() {
-  try { return window.settingsAPI } catch { return null }
+function ipc() {
+  try { return window.electron.ipcRenderer } catch { return null }
 }
 
 export async function load() {
   if (cache) return { ...cache };
-  const a = api();
-  if (!a) { cache = { ...defaults }; return { ...cache }; }
+  const r = ipc();
+  if (!r) { cache = { ...defaults }; return { ...cache }; }
   try {
-    cache = { ...defaults, ...(await a.load()) };
+    cache = { ...defaults, ...(await r.invoke('settings-load')) };
   } catch {
     cache = { ...defaults };
   }
@@ -42,9 +41,9 @@ export async function load() {
 
 export async function save(partial) {
   cache = { ...(cache || defaults), ...partial };
-  const a = api();
-  if (!a) return;
-  try { await a.save(cache) } catch { /* ignore */ }
+  const r = ipc();
+  if (!r) return;
+  try { await r.invoke('settings-save', cache) } catch { /* ignore */ }
 }
 
 export async function loadTheme() {
