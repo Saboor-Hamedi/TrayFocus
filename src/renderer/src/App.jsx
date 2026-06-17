@@ -416,6 +416,7 @@ function App() {
         width="w-56"
         collapsible={false}
         theme={sidebarStyle}
+        overlay={false}
         closeOnEscape={false}
         closeOnOverlayClick={false}
       >
