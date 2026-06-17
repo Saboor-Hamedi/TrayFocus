@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { EditorView, keymap, placeholder, lineNumbers, drawSelection } from '@codemirror/view';
 import { EditorState, Compartment } from '@codemirror/state';
 import { markdown, markdownLanguage, markdownKeymap } from '@codemirror/lang-markdown';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { tags } from '@lezer/highlight';
 import { Eye, Code2, GripVertical } from 'lucide-react';
 import Markdown from './Markdown';
 
@@ -14,6 +16,37 @@ const savePreview = (v) => { try { localStorage.setItem(STORAGE_KEY, v); } catch
 const loadSplit   = () => { try { const v = parseFloat(localStorage.getItem(STORAGE_SPLIT)); return v > 0.1 && v < 0.9 ? v : 0.5; } catch { return 0.5; } };
 const saveSplit   = (v) => { try { localStorage.setItem(STORAGE_SPLIT, v); } catch {} };
 
+/* ── Markdown syntax highlight style ────────────────────────── */
+const mdHighlight = HighlightStyle.define([
+  // Headings — each level a distinct hue
+  { tag: tags.heading1, color: '#c4b5fd', fontWeight: '700' },  // violet
+  { tag: tags.heading2, color: '#93c5fd', fontWeight: '700' },  // blue
+  { tag: tags.heading3, color: '#6ee7b7', fontWeight: '600' },  // emerald
+  { tag: tags.heading4, color: '#fcd34d', fontWeight: '600' },  // amber
+  { tag: [tags.heading5, tags.heading6], color: '#f9a8d4', fontWeight: '500' }, // pink
+  // Formatting marks (**, *, >, ` markers) — subtle
+  { tag: tags.processingInstruction, color: 'rgba(255,255,255,0.22)' },
+  // Bold / italic / strike
+  { tag: tags.strong,        color: '#f1f5f9', fontWeight: '700' },
+  { tag: tags.emphasis,      color: '#cbd5e1', fontStyle: 'italic' },
+  { tag: tags.strikethrough, color: '#52525b', textDecoration: 'line-through' },
+  // Links & URLs
+  { tag: tags.link, color: '#60a5fa' },
+  { tag: tags.url,  color: '#3b82f6' },
+  // Inline & fenced code
+  { tag: tags.monospace, color: '#f472b6' },
+  { tag: tags.labelName,  color: '#86efac' }, // fence info string (language name)
+  // Blockquote
+  { tag: tags.quote, color: '#94a3b8', fontStyle: 'italic' },
+  // List markers (- * 1.)
+  { tag: tags.list, color: '#34d399' },
+  // Horizontal rule
+  { tag: tags.contentSeparator, color: '#374151' },
+  // HTML escape / entity
+  { tag: tags.escape,    color: '#fbbf24' },
+  { tag: tags.character, color: '#fbbf24' },
+]);
+
 /* ── Build a CodeMirror theme from the current fontSize ──────── */
 const buildTheme = (fs) => EditorView.theme({
   '&': {
@@ -22,18 +55,17 @@ const buildTheme = (fs) => EditorView.theme({
     background: 'transparent',
   },
   '.cm-content': {
-    padding: '0',
+    padding: '16px 20px',          // proper breathing room
     fontFamily: 'ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace',
     caretColor: '#60a5fa',
     lineHeight: '1.65',
   },
-  '.cm-line': { whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.025)' },
   '.cm-activeLineGutter': { background: 'rgba(255,255,255,0.02)' },
   '.cm-selectionBackground, ::selection': { background: 'rgba(96,165,250,0.22) !important' },
   '.cm-gutters': {
     background: 'rgba(255,255,255,0.015)',
-    border: 'none',
+    borderRight: '1px solid rgba(255,255,255,0.05)',
     color: 'rgba(255,255,255,0.18)',
     fontSize: `${Math.max(fs * 0.78, 9)}px`,
     paddingRight: '4px',
@@ -72,12 +104,16 @@ const buildCursorTheme = (style, width) => {
   return EditorView.theme(styles, { dark: true });
 };
 
+/* Build a line-wrapping extension (toggleable) */
+const buildWrapExtension = (wrap) => wrap ? EditorView.lineWrapping : [];
+
 /* ── MarkdownEditor ──────────────────────────────────────────── */
-const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14, fontFamily = '', accentColor = '', cursorStyle = 'bar', cursorWidth = 2 }) => {
+const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14, fontFamily = '', accentColor = '', cursorStyle = 'bar', cursorWidth = 2, wrapLines = true }) => {
   const editorRef   = useRef(null);
   const viewRef     = useRef(null);
   const compartment = useRef(new Compartment()); // for dynamic fontSize updates
   const cursorCompartment = useRef(new Compartment()); // for dynamic cursor updates
+  const wrapCompartment   = useRef(new Compartment()); // for dynamic line wrapping
   const [preview, setPreview]     = useState(loadPreview);
   const [content, setContent]     = useState(value);
   const [splitRatio, setSplitRatio] = useState(loadSplit);
@@ -130,14 +166,17 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
       doc: value,
       extensions: [
           EditorState.readOnly.of(readOnly),
+          
           lineNumbers(),
           markdown({ base: markdownLanguage }),
           keymap.of([...markdownKeymap, ...defaultKeymap, ...historyKeymap]),
           history(),
           drawSelection(),
+          syntaxHighlighting(mdHighlight),
           placeholder('Write markdown here…'),
           compartment.current.of(buildTheme(fontSize)),
           cursorCompartment.current.of(buildCursorTheme(cursorStyle, cursorWidth)),
+          wrapCompartment.current.of(buildWrapExtension(wrapLines)),
           updateListener,
         ],
       parent: editorRef.current,
@@ -161,6 +200,14 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
       effects: cursorCompartment.current.reconfigure(buildCursorTheme(cursorStyle, cursorWidth)),
     });
   }, [cursorStyle, cursorWidth]);
+
+  /* Dynamically toggle line wrapping */
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: wrapCompartment.current.reconfigure(buildWrapExtension(wrapLines)),
+    });
+  }, [wrapLines]);
 
   /* Ctrl+\ toggles preview */
   useEffect(() => {

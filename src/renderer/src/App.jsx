@@ -401,6 +401,7 @@ function App() {
           fontSize={settingsValues.fontSize || 14}
           cursorStyle={settingsValues.cursorStyle || 'bar'}
           cursorWidth={settingsValues.cursorWidth || 2}
+          wrapLines={settingsValues.editorWrapLines ?? true}
           accentColor={accentClass}
         />
       ) : (

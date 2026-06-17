@@ -13,6 +13,7 @@ const defaults = {
   fontSize: 14,
   cursorStyle: 'bar',
   cursorWidth: 2,
+  editorWrapLines: true,
   compactMode: false,
   animationsEnabled: true,
   checkUpdates: true,
