@@ -349,6 +349,7 @@ function App() {
         showMinimize={settingsValues.minimizeToTray !== false}
         showMaximize={settingsValues.showMaximize !== false}
         pinned={alwaysOnTop}
+        onToggleSidebar={() => setIsSidebarOpen(p => !p)}
         updateStatus={updateStatus}
         appVersion={pkg.version}
         onCheckUpdate={() => ipcSend('check-for-updates')}

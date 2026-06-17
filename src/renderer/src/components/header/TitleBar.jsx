@@ -1,5 +1,5 @@
 import React, { memo, useState, useRef, useEffect } from 'react';
-import { Minus, Square, X, Pin, Download, RefreshCw } from 'lucide-react';
+import { Minus, Square, X, Pin, Download, RefreshCw, PanelLeftOpen } from 'lucide-react';
 
 const TitleBar  = ({
     title = "TrayFocus",
@@ -12,6 +12,7 @@ const TitleBar  = ({
     titleColor = '',
     updateStatus = null,
     appVersion = '1.0.0',
+    onToggleSidebar,
     onCheckUpdate,
     onDownloadUpdate,
     onInstallUpdate,
@@ -39,6 +40,13 @@ const TitleBar  = ({
         <>
 <div className={`flex h-8 w-full select-none items-center justify-between border-b border-zinc-800 ${backgroundColor} ${textColor} relative`}>
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
+        <button
+          onClick={onToggleSidebar}
+          className="mr-2 flex items-center justify-center size-6 rounded-md transition-colors hover:bg-white/5 [app-region:no-drag]"
+          title="Toggle sidebar"
+        >
+          <PanelLeftOpen className="h-3.5 w-3.5" strokeWidth={1.5} />
+        </button>
         <span className={`text-xs font-medium tracking-wide ${titleColor}`}>{title}</span>
         {pinned && <Pin className="ml-2 h-3 w-3 text-blue-400" strokeWidth={2.5} />}
 
