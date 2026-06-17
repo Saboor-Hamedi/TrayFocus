@@ -226,15 +226,15 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
         {preview && (
           <>
             <div
-              className="w-[5px] flex-shrink-0 cursor-col-resize flex items-center justify-center group hover:bg-white/[0.04] transition-colors border-x border-white/[0.05]"
+              className="w-[5px] flex-shrink-0 cursor-col-resize flex items-center justify-center group hover:bg-white/[0.04] transition-colors border-x border-zinc-700/30"
               onMouseDown={handleMouseDown}
             >
-              <GripVertical className="w-2.5 h-2.5 text-white/10 group-hover:text-white/30 transition-colors" />
+              <GripVertical className="w-2.5 h-2.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
             </div>
 
-            {/* Preview pane */}
+            {/* Preview pane — always dark background so content is readable on any app theme */}
             <div
-              className="overflow-y-auto bg-white/[0.01] select-text"
+              className="overflow-y-auto bg-zinc-900 select-text"
               style={{
                 width: previewW,
                 scrollbarWidth: 'thin',
