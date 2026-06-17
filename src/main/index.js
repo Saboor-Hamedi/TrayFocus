@@ -21,8 +21,16 @@ const saveSettings = (data) => {
 
 const getMinimizeToTray = () => loadSettings().minimizeToTray !== false
 
+const updateAutoStart = () => {
+  const s = loadSettings()
+  app.setLoginItemSettings({ openAtLogin: !!s.autostart })
+}
+
 ipcMain.handle('settings-load', () => loadSettings())
-ipcMain.handle('settings-save', (_e, data) => saveSettings(data))
+ipcMain.handle('settings-save', (_e, data) => {
+  saveSettings(data)
+  updateAutoStart()
+})
 
 let mainWindow = null
 let tray = null
@@ -131,6 +139,7 @@ app.whenReady().then(() => {
   createWindow()
   createTray()
   initAutoUpdater(mainWindow)
+  updateAutoStart()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

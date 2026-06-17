@@ -1,6 +1,6 @@
 {
   "name": "trayfocus",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "TrayFocus — a lightweight Electron desktop utility",
   "main": "./out/main/index.js",
   "author": "Saboor-Hamedi",
