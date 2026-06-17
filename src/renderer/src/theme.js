@@ -4,31 +4,49 @@
 // ============================================================
 
 const themes = [
-  // Neutral tones
-  { id: 'zinc',    name: 'Deep Zinc',      preview: 'bg-zinc-600',    bg: 'bg-zinc-950',    text: 'text-zinc-100',    titlebar: 'bg-zinc-900',    accent: 'text-blue-400' },
-  { id: 'slate',   name: 'Slate Gray',      preview: 'bg-slate-600',   bg: 'bg-slate-950',   text: 'text-slate-100',   titlebar: 'bg-slate-900',   accent: 'text-blue-400' },
-  { id: 'amoled',  name: 'AMOLED Black',    preview: 'bg-zinc-900',    bg: 'bg-black',       text: 'text-zinc-200',    titlebar: 'bg-black',       accent: 'text-purple-400' },
-  // Cool tones
-  { id: 'blue',    name: 'Ocean Blue',      preview: 'bg-blue-600',    bg: 'bg-blue-950',    text: 'text-blue-100',    titlebar: 'bg-blue-950',    accent: 'text-sky-400' },
-  { id: 'sky',     name: 'Sky Blue',        preview: 'bg-sky-600',     bg: 'bg-sky-950',     text: 'text-sky-100',     titlebar: 'bg-sky-900',     accent: 'text-cyan-400' },
-  { id: 'cyan',    name: 'Cyan',            preview: 'bg-cyan-600',    bg: 'bg-cyan-950',    text: 'text-cyan-100',    titlebar: 'bg-cyan-900',    accent: 'text-teal-400' },
-  { id: 'indigo',  name: 'Indigo',          preview: 'bg-indigo-600',  bg: 'bg-indigo-950',  text: 'text-indigo-100',  titlebar: 'bg-indigo-900',  accent: 'text-violet-400' },
-  { id: 'violet',  name: 'Violet',          preview: 'bg-violet-600',  bg: 'bg-violet-950',  text: 'text-violet-100',  titlebar: 'bg-violet-900',  accent: 'text-purple-400' },
-  { id: 'purple',  name: 'Royal Purple',    preview: 'bg-purple-600',  bg: 'bg-purple-950',  text: 'text-purple-100',  titlebar: 'bg-purple-900',  accent: 'text-fuchsia-400' },
-  // Warm tones
-  { id: 'red',     name: 'Ruby Red',        preview: 'bg-red-600',     bg: 'bg-red-950',     text: 'text-red-100',     titlebar: 'bg-red-900',     accent: 'text-orange-400' },
-  { id: 'rose',    name: 'Rose',            preview: 'bg-rose-600',    bg: 'bg-rose-950',    text: 'text-rose-100',    titlebar: 'bg-rose-900',    accent: 'text-pink-400' },
-  { id: 'pink',    name: 'Pink',            preview: 'bg-pink-600',    bg: 'bg-pink-950',    text: 'text-pink-100',    titlebar: 'bg-pink-900',    accent: 'text-rose-400' },
-  // Vibrant
-  { id: 'fuchsia', name: 'Fuchsia',         preview: 'bg-fuchsia-600', bg: 'bg-fuchsia-950', text: 'text-fuchsia-100', titlebar: 'bg-fuchsia-900', accent: 'text-pink-400' },
-  // Refined darks
-  { id: 'gray',    name: 'Steel Gray',      preview: 'bg-gray-600',    bg: 'bg-gray-950',    text: 'text-gray-100',    titlebar: 'bg-gray-900',    accent: 'text-blue-400' },
-  { id: 'neutral', name: 'Warm Gray',       preview: 'bg-neutral-600', bg: 'bg-neutral-950', text: 'text-neutral-100', titlebar: 'bg-neutral-900', accent: 'text-amber-400' },
-  { id: 'stone',   name: 'Stone',           preview: 'bg-stone-600',   bg: 'bg-stone-950',   text: 'text-stone-100',   titlebar: 'bg-stone-900',   accent: 'text-orange-400' },
-  // Special
-  { id: 'midnight',name: 'Midnight Blue',   preview: 'bg-[#1e3a5f]',   bg: 'bg-[#0b1121]',  text: 'text-[#e2e8f0]',  titlebar: 'bg-[#101b35]',  accent: 'text-blue-400' },
-  { id: 'dracula', name: 'Dracula',         preview: 'bg-[#6272a4]',   bg: 'bg-[#282a36]',  text: 'text-[#f8f8f2]',  titlebar: 'bg-[#191a21]',  accent: 'text-pink-400' },
-  { id: 'github',  name: 'GitHub Light',    preview: 'bg-[#d0d7de]',   bg: 'bg-[#ffffff]',  text: 'text-[#24292f]',  titlebar: 'bg-[#f6f8fa]',  accent: 'text-blue-500' },
+  // ── Neutral foundations ─────────────────────────────────────────
+  { id: 'zinc',    name: 'Deep Zinc',     preview: 'bg-zinc-700',        bg: 'bg-zinc-950',         text: 'text-zinc-100',       titlebar: 'bg-zinc-900',       accent: 'text-blue-400'    },
+  { id: 'slate',   name: 'Slate',         preview: 'bg-slate-700',       bg: 'bg-slate-950',        text: 'text-slate-100',      titlebar: 'bg-slate-900',      accent: 'text-sky-400'     },
+  { id: 'gray',    name: 'Steel',         preview: 'bg-gray-700',        bg: 'bg-gray-950',         text: 'text-gray-100',       titlebar: 'bg-gray-900',       accent: 'text-blue-400'    },
+  { id: 'neutral', name: 'Warm Gray',     preview: 'bg-neutral-700',     bg: 'bg-neutral-950',      text: 'text-neutral-100',    titlebar: 'bg-neutral-900',    accent: 'text-amber-400'   },
+  { id: 'stone',   name: 'Stone',         preview: 'bg-stone-700',       bg: 'bg-stone-950',        text: 'text-stone-100',      titlebar: 'bg-stone-900',      accent: 'text-orange-400'  },
+  { id: 'amoled',  name: 'AMOLED Black',  preview: 'bg-zinc-800',        bg: 'bg-black',            text: 'text-zinc-200',       titlebar: 'bg-[#080808]',      accent: 'text-violet-400'  },
+
+  // ── Dark blues ───────────────────────────────────────────────────
+  // Deep navy — barely blue-tinted near-black
+  { id: 'blue',    name: 'Navy Deep',     preview: 'bg-[#1a2744]',       bg: 'bg-[#080d1a]',        text: 'text-[#c8d5f0]',      titlebar: 'bg-[#050a14]',      accent: 'text-blue-400'    },
+  // Twilight — dark desaturated blue-indigo
+  { id: 'sky',     name: 'Twilight',      preview: 'bg-[#18263a]',       bg: 'bg-[#080e1a]',        text: 'text-[#bccfe8]',      titlebar: 'bg-[#05090f]',      accent: 'text-sky-400'     },
+  // Midnight Blue (rich, existing special)
+  { id: 'midnight',name: 'Midnight',      preview: 'bg-[#1e3a5f]',       bg: 'bg-[#0b1121]',        text: 'text-[#dde8f8]',      titlebar: 'bg-[#08101e]',      accent: 'text-blue-400'    },
+
+  // ── Peacock ──────────────────────────────────────────────────────
+  // Peacock — dark teal, the jewel-tone dark
+  { id: 'cyan',    name: 'Peacock',       preview: 'bg-[#0d2a2a]',       bg: 'bg-[#060e0e]',        text: 'text-[#b0d8d8]',      titlebar: 'bg-[#040a0a]',      accent: 'text-teal-400'    },
+  // Deep teal-indigo
+  { id: 'indigo',  name: 'Deep Indigo',   preview: 'bg-indigo-900',      bg: 'bg-indigo-950',       text: 'text-indigo-100',     titlebar: 'bg-[#0f0a28]',      accent: 'text-violet-400'  },
+
+  // ── Purples ──────────────────────────────────────────────────────
+  { id: 'violet',  name: 'Violet Night',  preview: 'bg-violet-900',      bg: 'bg-violet-950',       text: 'text-violet-100',     titlebar: 'bg-[#130c2a]',      accent: 'text-purple-400'  },
+  // Aubergine — very dark purple, almost black with a hint of eggplant
+  { id: 'purple',  name: 'Aubergine',     preview: 'bg-[#2d1a3e]',       bg: 'bg-[#0e0816]',        text: 'text-[#dcc8f5]',      titlebar: 'bg-[#09050f]',      accent: 'text-fuchsia-400' },
+  // Dracula
+  { id: 'dracula', name: 'Dracula',       preview: 'bg-[#6272a4]',       bg: 'bg-[#282a36]',        text: 'text-[#f8f8f2]',      titlebar: 'bg-[#191a21]',      accent: 'text-pink-400'    },
+
+  // ── Dark reds ────────────────────────────────────────────────────
+  // Dark Crimson — deep maroon, not bright red
+  { id: 'red',     name: 'Dark Crimson',  preview: 'bg-[#3a1010]',       bg: 'bg-[#0e0606]',        text: 'text-[#f0cece]',      titlebar: 'bg-[#090404]',      accent: 'text-red-400'     },
+  // Mauve Wine — dark dusty rose
+  { id: 'rose',    name: 'Mauve Wine',    preview: 'bg-[#38111e]',       bg: 'bg-[#0f0609]',        text: 'text-[#edc8d5]',      titlebar: 'bg-[#09040a]',      accent: 'text-rose-400'    },
+  // Obsidian — very dark fuchsia-purple, nearly black
+  { id: 'fuchsia', name: 'Obsidian',      preview: 'bg-[#2a1030]',       bg: 'bg-[#0c060f]',        text: 'text-[#e0c8f0]',      titlebar: 'bg-[#080408]',      accent: 'text-fuchsia-400' },
+
+  // ── Yellow dark ──────────────────────────────────────────────────
+  // Amber Dusk — dark amber/gold, barely warm-tinted near-black
+  { id: 'pink',    name: 'Amber Dusk',    preview: 'bg-[#3a2800]',       bg: 'bg-[#0f0a02]',        text: 'text-[#f0dda8]',      titlebar: 'bg-[#090600]',      accent: 'text-amber-400'   },
+
+  // ── Light ────────────────────────────────────────────────────────
+  { id: 'github',  name: 'GitHub Light',  preview: 'bg-[#d0d7de]',       bg: 'bg-[#ffffff]',        text: 'text-[#24292f]',      titlebar: 'bg-[#f6f8fa]',      accent: 'text-blue-500'    },
 ]
 
 // ID of the theme used when nothing is saved or match fails
