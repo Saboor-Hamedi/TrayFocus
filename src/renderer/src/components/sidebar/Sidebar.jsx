@@ -153,7 +153,7 @@ export const Sidebar = memo(({
       {/* Overlay */}
       {overlay && isOpen && !floating && (
         <div
-          className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
             isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
           onClick={closeOnOverlayClick ? onClose : undefined}

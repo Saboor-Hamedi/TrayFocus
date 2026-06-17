@@ -363,7 +363,7 @@ function App() {
 
   return (
     // root wrapper — fills the entire Electron window, flex column layout
-    <div className={`flex h-screen w-screen flex-col select-none overflow-hidden transition-all duration-300 ${themeClass} ${isSidebarOpen ? 'pl-56' : 'pl-0'}`}>
+    <div className={`flex h-screen w-screen flex-col select-none overflow-hidden transition-colors duration-300 ${themeClass}`}>
       {/* ---- custom title bar (pinned to top, frameless window controls) ---- */}
       <TitleBar
         title="TrayFocus"
@@ -384,6 +384,9 @@ function App() {
         onClose={() => ipcSend('window-close')}
       />
 
+      {/* ---- content wrapper — pushed right when sidebar opens (TitleBar stays full width) ---- */}
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'pl-56' : 'pl-0'}`}>
+
       {/* ---- main content area — fills remaining space after title bar ---- */}
       {activePage === 'chat' ? (
         <ChatPanel
@@ -403,6 +406,7 @@ function App() {
       ) : (
       <main className="flex-1" />
       )}
+      </div>
 
       {/* ---- sidebar panel (toggles in from the left) ---- */}
       <Sidebar
@@ -412,6 +416,8 @@ function App() {
         width="w-56"
         collapsible={false}
         theme={sidebarStyle}
+        closeOnEscape={false}
+        closeOnOverlayClick={false}
       >
         <SidebarHeader
           title="TrayFocus"
