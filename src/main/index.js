@@ -11,6 +11,19 @@ const settingsPath = () => {
   return join(dir, 'settings.json')
 }
 
+const docsDir = () => {
+  const dir = join(app.getPath('documents'), 'TrayFocus')
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+const sanitize = (name) => {
+  let clean = name.replace(/[<>:"/\\|?*]/g, '-').trim()
+  const dot = clean.lastIndexOf('.')
+  if (dot > 0) clean = clean.slice(0, dot)
+  return clean + '.md'
+}
+
 const loadSettings = () => {
   try { return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8')) } catch { return {} }
 }
@@ -30,6 +43,26 @@ ipcMain.handle('settings-load', () => loadSettings())
 ipcMain.handle('settings-save', (_e, data) => {
   saveSettings(data)
   updateAutoStart()
+})
+
+ipcMain.handle('file-save', (_e, filename, content) => {
+  const safeName = sanitize(filename)
+  const filePath = join(docsDir(), safeName)
+  fs.writeFileSync(filePath, content, 'utf-8')
+  return safeName
+})
+
+ipcMain.handle('file-read', (_e, filename) => {
+  const filePath = join(docsDir(), filename)
+  try { return fs.readFileSync(filePath, 'utf-8') } catch { return '' }
+})
+
+ipcMain.handle('file-list', () => {
+  try {
+    return fs.readdirSync(docsDir())
+      .filter(f => f.endsWith('.md'))
+      .map(f => f.replace('.md', ''))
+  } catch { return [] }
 })
 
 let mainWindow = null

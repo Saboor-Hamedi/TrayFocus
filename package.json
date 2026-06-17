@@ -21,10 +21,10 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
-    "publish:win": "node -e \"var v='v'+require('./package.json').version;var e=require('child_process');try{e.execSync('git tag -a '+v+' -m '+v+';git push origin '+v)}catch(_){};try{e.execSync('gh release delete '+v+' --yes')}catch(_){}\" && npm run build && electron-builder --win --publish always",
-    "publish:mac": "node -e \"try{require('child_process').execSync('gh release delete v'+require('./package.json').version+' --yes')}catch(e){}\" && npm run build && electron-builder --mac --publish always",
-    "publish:linux": "node -e \"try{require('child_process').execSync('gh release delete v'+require('./package.json').version+' --yes')}catch(e){}\" && npm run build && electron-builder --linux --publish always",
-    "publish:all": "node -e \"try{require('child_process').execSync('gh release delete v'+require('./package.json').version+' --yes')}catch(e){}\" && npm run build && electron-builder --win --mac --linux --publish always"
+    "publish:win": "node scripts/publish.js && npm run build && electron-builder --win --publish always",
+    "publish:mac": "node scripts/publish.js && npm run build && electron-builder --mac --publish always",
+    "publish:linux": "node scripts/publish.js && npm run build && electron-builder --linux --publish always",
+    "publish:all": "node scripts/publish.js && npm run build && electron-builder --win --mac --linux --publish always"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.3",

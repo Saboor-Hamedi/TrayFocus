@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText } from 'lucide-react';
+import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -12,6 +12,7 @@ import ChatPanel from './components/chat/ChatPanel';
 import MarkdownEditor from './components/chat/MarkdownEditor';
 import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
+import SaveModal from './components/modals/SaveModal';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import RightSidebar from './components/sidebar/right/RightSidebar';
 import { getTheme, getThemeClass } from './theme';
@@ -56,6 +57,15 @@ function App() {
   // Current markdown editor content (for RightSidebar stats)
   const [editorContent, setEditorContent] = useState('');
 
+  // Saved filename (null = unsaved, string = filename.md)
+  const [currentFilename, setCurrentFilename] = useState(null);
+
+  // Save modal
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
+  // List of saved notes from the vault
+  const [savedNotes, setSavedNotes] = useState([]);
+
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
@@ -98,6 +108,23 @@ function App() {
     const isDark = activeTheme !== 'github';
     document.documentElement.classList.toggle('dark', isDark);
   }, [activeTheme, settingsLoaded]);
+
+  // Auto-load last saved file on startup
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    try {
+      const lastFile = localStorage.getItem('trayfocus-last-file');
+      if (lastFile) {
+        window.filesAPI.read(lastFile).then((content) => {
+          if (content) {
+            setEditorContent(content);
+            setCurrentFilename(lastFile);
+          }
+        });
+      }
+    } catch {}
+    refreshNotes();
+  }, [settingsLoaded]);
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -156,6 +183,50 @@ function App() {
   // Toggle the right outline sidebar — used by Ctrl+Shift+B
   const toggleRightSidebar = useCallback(() => {
     setIsRightSidebarOpen((prev) => !prev);
+  }, []);
+
+  // Save markdown content
+  const doSave = useCallback((name) => {
+    try {
+      window.filesAPI.save(name, editorContent).then((savedName) => {
+        setCurrentFilename(savedName);
+        try { localStorage.setItem('trayfocus-last-file', savedName); } catch {}
+        refreshNotes();
+      });
+    } catch {}
+  }, [editorContent]);
+
+  const refreshNotes = useCallback(() => {
+    try {
+      window.filesAPI.list().then((list) => setSavedNotes(list));
+    } catch {}
+  }, []);
+
+  const loadNote = useCallback((name) => {
+    const filename = name + '.md';
+    try {
+      window.filesAPI.read(filename).then((content) => {
+        setEditorContent(content);
+        setCurrentFilename(filename);
+        try { localStorage.setItem('trayfocus-last-file', filename); } catch {}
+        setActivePage('markdown');
+      });
+    } catch {}
+  }, []);
+
+  const handleCtrlS = useCallback(() => {
+    if (activePage !== 'markdown') return;
+    if (currentFilename) {
+      doSave(currentFilename.replace('.md', ''));
+    } else {
+      setIsSaveModalOpen(true);
+    }
+  }, [activePage, currentFilename, doSave]);
+
+  const handleNewNote = useCallback(() => {
+    setEditorContent('');
+    setCurrentFilename(null);
+    setActivePage('markdown');
   }, []);
 
   // Toggle the settings modal — used by the Ctrl+, shortcut
@@ -320,6 +391,20 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+S saves the markdown document
+    const unregisterSave = register('s', handleCtrlS, {
+      ctrl: true,
+      description: 'Save document',
+      priority: 10,
+    });
+
+    // Ctrl+N creates a new blank note
+    const unregisterNewNote = register('n', handleNewNote, {
+      ctrl: true,
+      description: 'New note',
+      priority: 10,
+    });
+
     // Ctrl+Shift+P opens spotlight search
     const unregisterSpotlight = register('p', () => { setPaletteMode('spotlight'); setIsCommandPaletteOpen(true); }, {
       ctrl: true,
@@ -333,13 +418,15 @@ function App() {
       unregisterPalette();
       unregisterSidebar();
       unregisterRightSidebar();
+      unregisterSave();
+      unregisterNewNote();
       unregisterSettings();
       unregisterPin();
       unregisterCheatsheet();
       unregisterSpotlight();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleRightSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleRightSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet, handleCtrlS, handleNewNote]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -478,6 +565,28 @@ function App() {
             />
           </SidebarGroup>
 
+          {savedNotes.length > 0 && (
+            <SidebarGroup label="Notes" collapsible defaultCollapsed={false}>
+              {savedNotes.map((note) => {
+                const isActive = currentFilename === note + '.md';
+                return (
+                  <SidebarItem
+                    key={note}
+                    icon={
+                      <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
+                        <BookOpen className={`w-3 h-3 transition-colors ${isActive ? 'text-violet-300' : 'text-violet-400'}`} strokeWidth={2} />
+                      </div>
+                    }
+                    label={note}
+                    badge={<span className="text-[9px] text-black/20 dark:text-white/20 font-mono">.md</span>}
+                    active={isActive}
+                    onClick={() => loadNote(note)}
+                  />
+                );
+              })}
+            </SidebarGroup>
+          )}
+
         </div>
 
         <SidebarDivider />
@@ -552,6 +661,12 @@ function App() {
       <ShortcutCheatsheet
         isOpen={isCheatsheetOpen}
         onClose={() => setIsCheatsheetOpen(false)}
+      />
+
+      <SaveModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        onSave={doSave}
       />
     </div>
   );
