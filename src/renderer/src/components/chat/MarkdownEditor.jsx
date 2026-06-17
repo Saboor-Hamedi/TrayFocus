@@ -22,6 +22,8 @@ const buildTheme = (fs) => EditorView.theme({
     background: 'transparent',
   },
   '.cm-content': {
+    whiteSpace: 'pre',
+    overflowWrap: 'normal',
     padding: '0',
     fontFamily: 'ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace',
     caretColor: '#60a5fa',
@@ -29,6 +31,7 @@ const buildTheme = (fs) => EditorView.theme({
     whiteSpace: 'pre',
     overflowWrap: 'normal',
   },
+  '.cm-line': { whiteSpace: 'pre', overflowWrap: 'normal' },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.025)' },
   '.cm-activeLineGutter': { background: 'rgba(255,255,255,0.02)' },
   '.cm-selectionBackground, ::selection': { background: 'rgba(96,165,250,0.22) !important' },
