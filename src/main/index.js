@@ -24,6 +24,20 @@ const sanitize = (name) => {
   return clean + '.md'
 }
 
+const workspaceDir = () => {
+  const dir = join(docsDir(), '.trayfocus')
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+const loadWorkspace = () => {
+  try { return JSON.parse(fs.readFileSync(join(workspaceDir(), 'workspace.json'), 'utf-8')) } catch { return {} }
+}
+
+const saveWorkspace = (data) => {
+  fs.writeFileSync(join(workspaceDir(), 'workspace.json'), JSON.stringify(data, null, 2), 'utf-8')
+}
+
 const loadSettings = () => {
   try { return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8')) } catch { return {} }
 }
@@ -63,6 +77,17 @@ ipcMain.handle('file-list', () => {
       .filter(f => f.endsWith('.md'))
       .map(f => f.replace('.md', ''))
   } catch { return [] }
+})
+
+ipcMain.handle('file-delete', (_e, filename) => {
+  const filePath = join(docsDir(), filename)
+  try { fs.unlinkSync(filePath); return true } catch { return false }
+})
+
+ipcMain.handle('workspace-load', () => loadWorkspace())
+ipcMain.handle('workspace-save', (_e, data) => {
+  saveWorkspace(data)
+  return true
 })
 
 let mainWindow = null

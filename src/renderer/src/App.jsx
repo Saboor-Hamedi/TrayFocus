@@ -13,6 +13,7 @@ import MarkdownEditor from './components/chat/MarkdownEditor';
 import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import SaveModal from './components/modals/SaveModal';
+import ConfirmModal from './components/modals/ConfirmModal';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import RightSidebar from './components/sidebar/right/RightSidebar';
 import { getTheme, getThemeClass } from './theme';
@@ -66,6 +67,9 @@ function App() {
   // List of saved notes from the vault
   const [savedNotes, setSavedNotes] = useState([]);
 
+  // Confirm delete modal
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
   // Whether the settings modal is open or closed
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
@@ -112,18 +116,22 @@ function App() {
   // Auto-load last saved file on startup
   useEffect(() => {
     if (!settingsLoaded) return;
-    try {
-      const lastFile = localStorage.getItem('trayfocus-last-file');
-      if (lastFile) {
-        window.filesAPI.read(lastFile).then((content) => {
-          if (content) {
-            setEditorContent(content);
-            setCurrentFilename(lastFile);
-          }
-        });
+
+    window.workspaceAPI.load().then((ws) => {
+      const lastFile = ws.lastFile;
+      if (lastFile && window.filesAPI) {
+        window.filesAPI.read(lastFile)
+          .then((content) => {
+            if (content) {
+              setEditorContent(content);
+              setCurrentFilename(lastFile);
+            }
+          })
+          .catch(() => {});
       }
-    } catch {}
-    refreshNotes();
+    }).catch(() => {});
+
+    if (window.filesAPI) refreshNotes();
   }, [settingsLoaded]);
 
   // Update status (from main process auto-updater)
@@ -190,7 +198,7 @@ function App() {
     try {
       window.filesAPI.save(name, editorContent).then((savedName) => {
         setCurrentFilename(savedName);
-        try { localStorage.setItem('trayfocus-last-file', savedName); } catch {}
+        window.workspaceAPI.save({ lastFile: savedName });
         refreshNotes();
       });
     } catch {}
@@ -208,7 +216,7 @@ function App() {
       window.filesAPI.read(filename).then((content) => {
         setEditorContent(content);
         setCurrentFilename(filename);
-        try { localStorage.setItem('trayfocus-last-file', filename); } catch {}
+        window.workspaceAPI.save({ lastFile: filename });
         setActivePage('markdown');
       });
     } catch {}
@@ -228,6 +236,28 @@ function App() {
     setCurrentFilename(null);
     setActivePage('markdown');
   }, []);
+
+  const handleDeleteNote = useCallback(() => {
+    if (!currentFilename) return;
+    try {
+      const nameWithoutExt = currentFilename.replace('.md', '');
+      window.filesAPI.delete(currentFilename).then(() => {
+        const idx = savedNotes.indexOf(nameWithoutExt);
+        const remaining = savedNotes.filter(n => n !== nameWithoutExt);
+        setSavedNotes(remaining);
+
+        // Jump to closest note, or reset
+        if (remaining.length > 0) {
+          const next = remaining[Math.min(idx, remaining.length - 1)];
+          loadNote(next);
+        } else {
+          setEditorContent('');
+          setCurrentFilename(null);
+          window.workspaceAPI.save({ lastFile: '' });
+        }
+      });
+    } catch {}
+  }, [currentFilename, savedNotes, loadNote]);
 
   // Toggle the settings modal — used by the Ctrl+, shortcut
   const toggleSettings = useCallback(() => {
@@ -405,6 +435,15 @@ function App() {
       priority: 10,
     });
 
+    // Ctrl+D deletes the current note
+    const unregisterDelete = register('d', () => {
+      if (currentFilename) setIsDeleteConfirmOpen(true);
+    }, {
+      ctrl: true,
+      description: 'Delete note',
+      priority: 10,
+    });
+
     // Ctrl+Shift+P opens spotlight search
     const unregisterSpotlight = register('p', () => { setPaletteMode('spotlight'); setIsCommandPaletteOpen(true); }, {
       ctrl: true,
@@ -420,13 +459,14 @@ function App() {
       unregisterRightSidebar();
       unregisterSave();
       unregisterNewNote();
+      unregisterDelete();
       unregisterSettings();
       unregisterPin();
       unregisterCheatsheet();
       unregisterSpotlight();
       stopListening();
     };
-  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleRightSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet, handleCtrlS, handleNewNote]);
+  }, [toggleThemeModal, toggleCommandPalette, toggleSidebar, toggleRightSidebar, toggleSettings, toggleAlwaysOnTop, toggleCheatsheet, handleCtrlS, handleNewNote, handleDeleteNote]);
 
   // ---- derived values ----
   // Full theme object (id, name, Tailwind classes) for the active theme
@@ -668,6 +708,20 @@ function App() {
         isOpen={isSaveModalOpen}
         onClose={() => setIsSaveModalOpen(false)}
         onSave={doSave}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => {
+          setIsDeleteConfirmOpen(false);
+          handleDeleteNote();
+        }}
+        title="Delete note"
+        message={currentFilename ? `Permanently delete "${currentFilename}" from the vault? This cannot be undone.` : ''}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmVariant="danger"
       />
     </div>
   );

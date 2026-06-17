@@ -15,6 +15,12 @@ const filesAPI = {
   save: (filename, content) => ipcRenderer.invoke('file-save', filename, content),
   read: (filename) => ipcRenderer.invoke('file-read', filename),
   list: () => ipcRenderer.invoke('file-list'),
+  delete: (filename) => ipcRenderer.invoke('file-delete', filename),
+}
+
+const workspaceAPI = {
+  load: () => ipcRenderer.invoke('workspace-load'),
+  save: (data) => ipcRenderer.invoke('workspace-save', data),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -26,6 +32,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('settingsAPI', settingsAPI)
     contextBridge.exposeInMainWorld('filesAPI', filesAPI)
+    contextBridge.exposeInMainWorld('workspaceAPI', workspaceAPI)
   } catch (error) {
     console.error(error)
   }
@@ -34,4 +41,5 @@ if (process.contextIsolated) {
   window.api = api
   window.settingsAPI = settingsAPI
   window.filesAPI = filesAPI
+  window.workspaceAPI = workspaceAPI
 }
