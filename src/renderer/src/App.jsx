@@ -1,5 +1,6 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen } from 'lucide-react';
+import { Virtuoso } from 'react-virtuoso';
+import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen, ChevronDown } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -40,6 +41,20 @@ const ipcSend = (channel) => {
   try { window.electron.ipcRenderer.send(channel) } catch { /* ignore */ }
 };
 
+const NoteItem = memo(({ note, isActive, onLoad }) => (
+  <SidebarItem
+    icon={
+      <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
+        <BookOpen className={`w-3 h-3 transition-colors ${isActive ? 'text-violet-300' : 'text-violet-400'}`} strokeWidth={2} />
+      </div>
+    }
+    label={note}
+    badge={<span className="text-[9px] text-black/20 dark:text-white/20 font-mono">.md</span>}
+    active={isActive}
+    onClick={onLoad}
+  />
+));
+
 function App() {
   // ---- state ----
   // Whether the theme picker modal is open or closed
@@ -66,6 +81,9 @@ function App() {
 
   // List of saved notes from the vault
   const [savedNotes, setSavedNotes] = useState([]);
+
+  // Notes section collapse state
+  const [isNotesCollapsed, setIsNotesCollapsed] = useState(false);
 
   // Confirm delete modal
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -308,7 +326,7 @@ function App() {
       description: 'Search anything — commands, themes, settings, shortcuts',
       shortcut: 'Ctrl+Space',
       keywords: ['find', 'search', 'global'],
-      action: () => setIsSpotlightOpen(true),
+      action: () => { setPaletteMode('spotlight'); setIsCommandPaletteOpen(true); },
     },
     {
       id: 'update',
@@ -590,44 +608,54 @@ function App() {
           subtitle={`v${pkg.version}`}
         />
 
-        <div className="flex-1 overflow-y-auto">
-          <SidebarGroup label="Main">
-            <SidebarItem
-              icon={<div className="w-5 h-5 rounded bg-blue-500/15 flex items-center justify-center"><MessageCircle className="w-3 h-3 text-blue-400" strokeWidth={2} /></div>}
-              label="AI Chat"
-              active={activePage === 'chat'}
-              onClick={() => setActivePage('chat')}
-            />
-            <SidebarItem
-              icon={<div className="w-5 h-5 rounded bg-emerald-500/15 flex items-center justify-center"><FileText className="w-3 h-3 text-emerald-400" strokeWidth={2} /></div>}
-              label="Markdown Editor"
-              active={activePage === 'markdown'}
-              onClick={() => setActivePage('markdown')}
-            />
-          </SidebarGroup>
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="shrink-0">
+            <SidebarGroup label="Main">
+              <SidebarItem
+                icon={<div className="w-5 h-5 rounded bg-blue-500/15 flex items-center justify-center"><MessageCircle className="w-3 h-3 text-blue-400" strokeWidth={2} /></div>}
+                label="AI Chat"
+                active={activePage === 'chat'}
+                onClick={() => setActivePage('chat')}
+              />
+              <SidebarItem
+                icon={<div className="w-5 h-5 rounded bg-emerald-500/15 flex items-center justify-center"><FileText className="w-3 h-3 text-emerald-400" strokeWidth={2} /></div>}
+                label="Markdown Editor"
+                active={activePage === 'markdown'}
+                onClick={() => setActivePage('markdown')}
+              />
+            </SidebarGroup>
+          </div>
 
           {savedNotes.length > 0 && (
-            <SidebarGroup label="Notes" collapsible defaultCollapsed={false}>
-              {savedNotes.map((note) => {
-                const isActive = currentFilename === note + '.md';
-                return (
-                  <SidebarItem
-                    key={note}
-                    icon={
-                      <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
-                        <BookOpen className={`w-3 h-3 transition-colors ${isActive ? 'text-violet-300' : 'text-violet-400'}`} strokeWidth={2} />
-                      </div>
-                    }
-                    label={note}
-                    badge={<span className="text-[9px] text-black/20 dark:text-white/20 font-mono">.md</span>}
-                    active={isActive}
-                    onClick={() => loadNote(note)}
+            <div className="flex-1 min-h-0 flex flex-col px-2 py-1">
+              <div
+                className="flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/30 cursor-pointer hover:opacity-80 transition-opacity select-none"
+                onClick={() => setIsNotesCollapsed(!isNotesCollapsed)}
+              >
+                <span>Notes</span>
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isNotesCollapsed ? '-rotate-90' : ''}`} strokeWidth={2} />
+              </div>
+              {!isNotesCollapsed && (
+                <div className="flex-1 min-h-0">
+                  <Virtuoso
+                    totalCount={savedNotes.length}
+                    computeItemKey={(index) => savedNotes[index]}
+                    itemContent={(index) => {
+                      const note = savedNotes[index];
+                      const isActive = currentFilename === note + '.md';
+                      return (
+                        <NoteItem
+                          note={note}
+                          isActive={isActive}
+                          onLoad={() => loadNote(note)}
+                        />
+                      );
+                    }}
                   />
-                );
-              })}
-            </SidebarGroup>
+                </div>
+              )}
+            </div>
           )}
-
         </div>
 
         <SidebarDivider />
@@ -656,6 +684,8 @@ function App() {
         mode={paletteMode}
         placeholder={paletteMode === 'spotlight' ? 'Search anything...' : 'Search commands...'}
         spotlightExtras={{
+          notes: savedNotes,
+          onOpenNote: loadNote,
           onOpenTheme: (id) => { setActiveTheme(id); settings.saveTheme(id); },
           onOpenSettings: () => setIsSettingsModalOpen(true),
         }}

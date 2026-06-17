@@ -38,8 +38,6 @@ const EmptyState = () => (
   </div>
 );
 
-/* ── Date / session divider ──────────────────────────── */
-
 /* ── Main panel ──────────────────────────────────────── */
 const ChatPanel = ({ apiKey, providerId, model, fontSize = 14, accentColor = '' }) => {
   const [messages, setMessages] = useState([]);

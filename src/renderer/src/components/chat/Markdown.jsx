@@ -316,8 +316,6 @@ const preprocessMarkdown = (raw) => {
 /* ── Post-process HTML: highlight #tag and @mention ─────────── */
 // Splits on <code>/<pre> blocks so we never modify code content.
 const CODE_BLOCK_RE = /(<(?:code|pre)\b[^>]*>[\s\S]*?<\/(?:code|pre)>)/gi;
-const TAG_RE      = /((?:^|(?<=[\s>.,;!?(]))(#\w+))/g;
-const MENTION_RE  = /((?:^|(?<=[\s>.,;!?(]))(@\w+))/g;
 
 const addTagsMentions = (rawHtml) =>
   rawHtml.split(CODE_BLOCK_RE).map((chunk, i) => {

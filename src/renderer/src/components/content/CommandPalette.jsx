@@ -58,24 +58,32 @@ const CommandPalette = ({
   shortcutsRef.current = shortcuts;
 
   const filterResults = useCallback((q) => {
-    if (!isSpotlight || !q.trim()) return [];
+    if (!q.trim()) return [];
 
     const lower = q.toLowerCase().trim();
     const all = [];
-    const t = themesRef.current;
-    const sc = shortcutsRef.current;
 
-    all.push(...commands
+    const filteredCommands = commands
       .filter(c => c.name.toLowerCase().includes(lower) || c.keywords?.some(k => k.includes(lower)))
-      .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) })));
+      .map(c => ({ ...c, kind: 'command', score: score(c.name, c.keywords, lower) }));
+    all.push(...filteredCommands);
 
-    all.push(...t
-      .filter(t => t.name.toLowerCase().includes(lower))
-      .map(t => ({ ...t, kind: 'theme', label: t.name, action: () => spotlightExtras.onOpenTheme?.(t.id), score: 5 })));
+    const notes = spotlightExtras.notes || [];
+    all.push(...notes
+      .filter(n => n.toLowerCase().includes(lower))
+      .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
 
-    all.push(...sc
-      .filter(s => s.description.toLowerCase().includes(lower))
-      .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
+    if (isSpotlight) {
+      const t = themesRef.current;
+      all.push(...t
+        .filter(t => t.name.toLowerCase().includes(lower))
+        .map(t => ({ ...t, kind: 'theme', label: t.name, action: () => spotlightExtras.onOpenTheme?.(t.id), score: 5 })));
+
+      const sc = shortcutsRef.current;
+      all.push(...sc
+        .filter(s => s.description.toLowerCase().includes(lower))
+        .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
+    }
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
   }, [isSpotlight, commands, spotlightExtras]);
@@ -172,9 +180,13 @@ const CommandPalette = ({
           </div>
 
           <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
-            {!isSpotlight && query.trim() ? (
+            {!isSpotlight && !query.trim() ? (
               <div className="px-4 py-6 text-center text-white/20">
-                <p className="text-xs">Type <span className="text-white/40">Ctrl+Shift+P</span> or <span className="text-white/40">&gt;</span> to search</p>
+                <p className="text-xs">Type to search notes, or <span className="text-white/40">&gt;</span> for more</p>
+              </div>
+            ) : !isSpotlight && query.trim() && results.length === 0 ? (
+              <div className="px-4 py-6 text-center text-white/20">
+                <p className="text-xs">{emptyMessage}</p>
               </div>
             ) : results.length === 0 && query.trim() ? (
               <div className="px-4 py-6 text-center text-white/20">
@@ -193,9 +205,9 @@ const CommandPalette = ({
                     i === selectedIndex ? style.selected : style.hover
                   }`}
                 >
-                  <span className="text-sm flex-shrink-0 w-6 text-center">
-                    {r.kind === 'command' ? (r.icon || '⚡') : r.kind === 'theme' ? '🎨' : r.kind === 'shortcut' ? '⌨' : r.kind === 'setting' ? '⚙️' : (r.icon || '→')}
-                  </span>
+      <span className="text-sm flex-shrink-0 w-6 text-center">
+        {r.kind === 'command' ? (r.icon || '⚡') : r.kind === 'theme' ? '🎨' : r.kind === 'shortcut' ? '⌨' : r.kind === 'setting' ? '⚙️' : r.kind === 'note' ? '📄' : (r.icon || '→')}
+      </span>
                   <div className="flex-1 min-w-0">
                     <div className={`text-xs ${style.text} truncate`}>{r.label || r.name}</div>
                     {r.description && <div className={`text-[10px] ${style.textMuted} truncate`}>{r.description}</div>}

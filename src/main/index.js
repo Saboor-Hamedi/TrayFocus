@@ -35,7 +35,9 @@ const loadWorkspace = () => {
 }
 
 const saveWorkspace = (data) => {
-  fs.writeFileSync(join(workspaceDir(), 'workspace.json'), JSON.stringify(data, null, 2), 'utf-8')
+  try {
+    fs.writeFileSync(join(workspaceDir(), 'workspace.json'), JSON.stringify(data, null, 2), 'utf-8')
+  } catch { /* disk full or permission issue */ }
 }
 
 const loadSettings = () => {
