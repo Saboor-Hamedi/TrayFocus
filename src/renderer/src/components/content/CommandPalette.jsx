@@ -81,8 +81,8 @@ const CommandPalette = ({
     } else {
       const notes = spotlightExtras.notes || [];
       all.push(...notes
-        .filter(n => n.toLowerCase().includes(lower))
-        .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
+      .filter(n => n.toLowerCase().includes(lower))
+      .map(n => ({ id: `note-${n}`, kind: 'note', label: n, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
     }
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
@@ -95,7 +95,6 @@ const CommandPalette = ({
       id: `note-${n}`,
       kind: 'note',
       label: n,
-      name: `${n}.md`,
       action: () => spotlightExtras.onOpenNote?.(n),
     }));
   }, [spotlightExtras.notes]);

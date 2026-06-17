@@ -1,6 +1,6 @@
-import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { memo, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen, ChevronDown } from 'lucide-react';
+import { Palette, Cog, Zap, Keyboard, Wrench, PaintBucket, MessageCircle, Key, FileText, BookOpen, ChevronDown, Trash2, X, Pin, Minimize, TypeOutline, CloudSync, Spotlight, Settings, MessageCircleMore, Heading1 } from 'lucide-react';
 import TitleBar from './components/header/TitleBar';
 import ThemeModal from './components/modals/ThemeModal';
 import SettingsModal from './components/modals/SettingsModal';
@@ -15,6 +15,9 @@ import AIPanel from './components/settings/AIPanel';
 import ShortcutCheatsheet from './components/modals/ShortcutCheatsheet';
 import SaveModal from './components/modals/SaveModal';
 import ConfirmModal from './components/modals/ConfirmModal';
+import RenameModal from './components/modals/RenameModal';
+import EmojiModal from './components/emojis/EmojiModal';
+import { ContextMenuProvider, useContextMenu } from './components/menu/ContextMenu';
 import Sidebar, { SidebarHeader, SidebarItem, SidebarGroup, SidebarDivider } from './components/sidebar/Sidebar.jsx';
 import RightSidebar from './components/sidebar/right/RightSidebar';
 import { getTheme, getThemeClass } from './theme';
@@ -41,19 +44,91 @@ const ipcSend = (channel) => {
   try { window.electron.ipcRenderer.send(channel) } catch { /* ignore */ }
 };
 
-const NoteItem = memo(({ note, isActive, onLoad }) => (
-  <SidebarItem
-    icon={
-      <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
-        <BookOpen className={`w-3 h-3 transition-colors ${isActive ? 'text-violet-300' : 'text-violet-400'}`} strokeWidth={2} />
-      </div>
-    }
-    label={note}
-    badge={<span className="text-[9px] text-black/20 dark:text-white/20 font-mono">.md</span>}
-    active={isActive}
-    onClick={onLoad}
-  />
+const NoteItem = memo(({ note, emoji, isActive, onLoad, onContextMenu }) => (
+  <div onContextMenu={onContextMenu} className="outline-none">
+    <SidebarItem
+      icon={emoji
+        ? <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
+            <span className="text-[13px] leading-none">{emoji}</span>
+          </div>
+        : <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-violet-500/30' : 'bg-violet-500/15'}`}>
+            <BookOpen className={`w-3 h-3 transition-colors ${isActive ? 'text-violet-300' : 'text-violet-400'}`} strokeWidth={2} />
+          </div>
+      }
+      label={note}
+      active={isActive}
+      onClick={onLoad}
+    />
+  </div>
 ));
+
+const NotesSection = memo(({ notes, currentFilename, loadNote, isNotesCollapsed, setIsNotesCollapsed, isDeleteConfirmOpen, setIsDeleteConfirmOpen, setSavedNotes, setIsEmojiModalOpen, iconTargetRef, noteIcons, handleSetIcon }) => {
+  const { showContextMenu } = useContextMenu();
+
+  if (!notes || notes.length === 0) return null;
+
+  return (
+    <div className="flex-1 min-h-0 flex flex-col px-2 py-1">
+      <div
+        className="flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/30 cursor-pointer hover:opacity-80 transition-opacity select-none"
+        onClick={() => setIsNotesCollapsed(!isNotesCollapsed)}
+      >
+        <span>Notes</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isNotesCollapsed ? '-rotate-90' : ''}`} strokeWidth={2} />
+      </div>
+      {!isNotesCollapsed && (
+        <div className="flex-1 min-h-0">
+          <Virtuoso
+            totalCount={notes.length}
+            computeItemKey={(index) => notes[index]}
+            itemContent={(index) => {
+              const note = notes[index];
+              const isActive = currentFilename === note + '.md';
+              return (
+                <NoteItem
+                  note={note}
+                  emoji={noteIcons[note + '.md'] || null}
+                  isActive={isActive}
+                  onLoad={() => loadNote(note)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    const filename = note + '.md';
+                    const hasIcon = !!noteIcons[filename];
+                    showContextMenu({
+                      x: e.clientX,
+                      y: e.clientY,
+                      items: [
+                        { label: 'Open', icon: <FileText className="w-3.5 h-3.5" />, shortcut: 'Enter', action: () => loadNote(note) },
+                        { type: 'divider' },
+                        { label: 'Change Icon', icon: <span className="text-xs">🎨</span>, action: () => {
+                          iconTargetRef.current = note;
+                          setIsEmojiModalOpen(true);
+                        } },
+                        ...(hasIcon ? [{ label: 'Remove Icon', icon: <span className="text-xs">✕</span>, action: () => {
+                          handleSetIcon(note, '');
+                        } }] : []),
+                        { type: 'divider' },
+                        { label: 'Delete', icon: <Trash2 className="w-3.5 h-3.5" />, danger: true, action: () => {
+                          if (filename === currentFilename) {
+                            setIsDeleteConfirmOpen(true);
+                          } else {
+                            window.filesAPI.delete(filename).then(() => {
+                              setSavedNotes(p => p.filter(n => n !== note));
+                            });
+                          }
+                        }},
+                      ],
+                    });
+                  }}
+                />
+              );
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+});
 
 function App() {
   // ---- state ----
@@ -79,6 +154,9 @@ function App() {
   // Save modal
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
+
   // List of saved notes from the vault
   const [savedNotes, setSavedNotes] = useState([]);
 
@@ -88,69 +166,25 @@ function App() {
   // Confirm delete modal
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  // Whether the settings modal is open or closed
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  // Rename modal
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
-  // Whether the shortcut cheatsheet is open
-  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
+  // Emoji picker
+  const [isEmojiModalOpen, setIsEmojiModalOpen] = useState(false);
 
-  // Active content page — will be immediately overwritten by settings.load()
+  const iconTargetRef = useRef(null);
+
+  const [noteIcons, setNoteIcons] = useState({});
+
+  // Active content page
   const [activePage, setActivePage] = useState('chat');
 
-  // Currently active theme ID — loaded from settings.json on mount
+  // Currently active theme ID
   const [activeTheme, setActiveTheme] = useState('zinc');
 
-  // Persistent settings loaded from settings.json
-  // These must be declared BEFORE the activePage useEffect that references settingsLoaded.
   const [settingsValues, setSettingsValues] = useState({});
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
-
-  // Sync active page to settings.json when it changes.
-  // Guard with settingsLoaded so we never save before load() has completed.
-  useEffect(() => {
-    if (settingsLoaded) settings.save({ activePage });
-  }, [activePage, settingsLoaded]);
-
-  useEffect(() => {
-    settings.load().then((data) => {
-      setActiveTheme(data.theme || 'zinc');
-      setActivePage(data.activePage || 'chat');
-      setSettingsValues(data);
-      setAlwaysOnTop(data.alwaysOnTop || false);
-      if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
-      setSettingsLoaded(true);
-    });
-  }, []);
-
-  // Toggle `dark` class on <html> for Tailwind `dark:` variant.
-  // Only the GitHub light theme disables dark mode; every other theme is dark.
-  useEffect(() => {
-    if (!settingsLoaded) return;
-    const isDark = activeTheme !== 'github';
-    document.documentElement.classList.toggle('dark', isDark);
-  }, [activeTheme, settingsLoaded]);
-
-  // Auto-load last saved file on startup
-  useEffect(() => {
-    if (!settingsLoaded) return;
-
-    window.workspaceAPI.load().then((ws) => {
-      const lastFile = ws.lastFile;
-      if (lastFile && window.filesAPI) {
-        window.filesAPI.read(lastFile)
-          .then((content) => {
-            if (content) {
-              setEditorContent(content);
-              setCurrentFilename(lastFile);
-            }
-          })
-          .catch(() => {});
-      }
-    }).catch(() => {});
-
-    if (window.filesAPI) refreshNotes();
-  }, [settingsLoaded]);
 
   // Update status (from main process auto-updater)
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -173,43 +207,48 @@ function App() {
     }
   }, [settingsLoaded, settingsValues.checkUpdates]);
 
-  const toggleAlwaysOnTop = useCallback(() => {
-    try {
-      const pinned = window.electron.ipcRenderer.sendSync('toggle-always-on-top');
-      setAlwaysOnTop(pinned);
-      settings.save({ alwaysOnTop: pinned });
-    } catch { /* noop */ }
+  // Sync active page to settings
+  useEffect(() => {
+    if (settingsLoaded) settings.save({ activePage });
+  }, [activePage, settingsLoaded]);
+
+  useEffect(() => {
+    settings.load().then((data) => {
+      setActiveTheme(data.theme || 'zinc');
+      setActivePage(data.activePage || 'chat');
+      setSettingsValues(data);
+      setAlwaysOnTop(data.alwaysOnTop || false);
+      if (data.alwaysOnTop) ipcSend('toggle-always-on-top');
+      setSettingsLoaded(true);
+    });
   }, []);
 
-  // ---- callbacks ----
-  // Select a theme and persist it to settings.json
-  const handleSelectTheme = useCallback((id) => {
-    setActiveTheme(id);
-    settings.saveTheme(id);
-  }, []);
+  // Toggle `dark` class on <html>
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    const isDark = activeTheme !== 'github';
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [activeTheme, settingsLoaded]);
 
-  // Toggle the theme modal open/closed — used by the Ctrl+T shortcut
-  const toggleThemeModal = useCallback(() => {
-    setIsThemeModalOpen((prev) => !prev);
-  }, []);
+  // Auto-load last saved file + icons on startup
+  useEffect(() => {
+    if (!settingsLoaded) return;
 
-  const toggleCommandPalette = useCallback(() => {
-    setIsCommandPaletteOpen((prev) => !prev);
-  }, []);
+    window.workspaceAPI.load().then((ws) => {
+      if (ws.icons) setNoteIcons(ws.icons);
+      const lastFile = ws.lastFile;
+      if (lastFile && window.filesAPI) {
+        window.filesAPI.read(lastFile).then((content) => {
+          if (content) {
+            setEditorContent(content);
+            setCurrentFilename(lastFile);
+          }
+        }).catch(() => {});
+      }
+    }).catch(() => {});
 
-  const toggleCheatsheet = useCallback(() => {
-    setIsCheatsheetOpen((prev) => !prev);
-  }, []);
-
-  // Toggle the sidebar — used by the Ctrl+B shortcut
-  const toggleSidebar = useCallback(() => {
-    setIsSidebarOpen((prev) => !prev);
-  }, []);
-
-  // Toggle the right outline sidebar — used by Ctrl+Shift+B
-  const toggleRightSidebar = useCallback(() => {
-    setIsRightSidebarOpen((prev) => !prev);
-  }, []);
+    if (window.filesAPI) refreshNotes();
+  }, [settingsLoaded]);
 
   // Save markdown content
   const doSave = useCallback((name) => {
@@ -221,6 +260,30 @@ function App() {
       });
     } catch {}
   }, [editorContent]);
+
+  const handleRename = useCallback((newName) => {
+    if (!currentFilename) return;
+    try {
+      window.filesAPI.save(newName, editorContent).then((savedName) => {
+        window.filesAPI.delete(currentFilename);
+        setCurrentFilename(savedName);
+        window.workspaceAPI.save({ lastFile: savedName });
+        refreshNotes();
+      });
+    } catch {}
+  }, [currentFilename, editorContent]);
+
+  const handleSetIcon = useCallback((noteName, emoji) => {
+    const filename = noteName + '.md';
+    const next = { ...noteIcons };
+    if (emoji) {
+      next[filename] = emoji;
+    } else {
+      delete next[filename];
+    }
+    setNoteIcons(next);
+    window.workspaceAPI.save({ lastFile: currentFilename || undefined, icons: next });
+  }, [noteIcons, currentFilename]);
 
   const refreshNotes = useCallback(() => {
     try {
@@ -282,13 +345,46 @@ function App() {
     setIsSettingsModalOpen((prev) => !prev);
   }, []);
 
+  const toggleThemeModal = useCallback(() => {
+    setIsThemeModalOpen((prev) => !prev);
+  }, []);
+
+  const toggleCommandPalette = useCallback(() => {
+    setIsCommandPaletteOpen((prev) => !prev);
+  }, []);
+
+  const toggleCheatsheet = useCallback(() => {
+    setIsCheatsheetOpen((prev) => !prev);
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
+  }, []);
+
+  const toggleRightSidebar = useCallback(() => {
+    setIsRightSidebarOpen((prev) => !prev);
+  }, []);
+
+  const toggleAlwaysOnTop = useCallback(() => {
+    try {
+      const pinned = window.electron.ipcRenderer.sendSync('toggle-always-on-top');
+      setAlwaysOnTop(pinned);
+      settings.save({ alwaysOnTop: pinned });
+    } catch { /* noop */ }
+  }, []);
+
+  const handleSelectTheme = useCallback((id) => {
+    setActiveTheme(id);
+    settings.saveTheme(id);
+  }, []);
+
   // ---- command palette commands ----
   // These are the actions that appear when the user opens the palette
   const commands = useMemo(() => [
     {
       id: 'nav-chat',
       name: 'Chat',
-      icon: '💬',
+      icon: <MessageCircle className="w-3.5 h-3.5" strokeWidth={2} />,
       description: 'Switch to the Chat page',
       keywords: ['ai', 'assistant', 'gpt'],
       action: () => setActivePage('chat'),
@@ -296,7 +392,7 @@ function App() {
     {
       id: 'nav-markdown',
       name: 'Markdown',
-      icon: '📝',
+      icon: <Heading1 className='w-3.5 h-3.5' strokeWidth={2} />,
       description: 'Switch to the Markdown editor',
       keywords: ['editor', 'write'],
       action: () => setActivePage('markdown'),
@@ -304,7 +400,7 @@ function App() {
     {
       id: 'settings',
       name: 'Open Settings',
-      icon: '⚙️',
+      icon: <Settings className='w-3.5 h-3.5' strokeWidth={2} />,
       description: 'Configure application settings',
       shortcut: 'Ctrl+,',
       keywords: ['preferences', 'config', 'options'],
@@ -313,7 +409,8 @@ function App() {
     {
       id: 'cheatsheet',
       name: 'Keyboard Shortcuts',
-      icon: '⌨',
+     
+      icon: <Keyboard className='w-3.5 h-3.5' strokeWidth={2}/>,
       description: 'Show all keyboard shortcuts',
       shortcut: 'Ctrl+/',
       keywords: ['hotkeys', 'help', 'reference'],
@@ -322,7 +419,8 @@ function App() {
     {
       id: 'spotlight',
       name: 'Spotlight Search',
-      icon: '🔍',
+    
+      icon: <Spotlight className="w-3.5 h-3.5" strokeWidth={2}/>,
       description: 'Search anything — commands, themes, settings, shortcuts',
       shortcut: 'Ctrl+Space',
       keywords: ['find', 'search', 'global'],
@@ -331,7 +429,8 @@ function App() {
     {
       id: 'update',
       name: 'Check for Updates',
-      icon: '🔄',
+      
+      icon: <CloudSync className='w-3.5 h-3.5' strokeWidth={2} />,
       description: 'Check and install the latest version',
       keywords: ['upgrade', 'version', 'release'],
       action: () => ipcSend('check-for-updates'),
@@ -339,7 +438,7 @@ function App() {
     {
       id: 'sidebar',
       name: 'Toggle Sidebar',
-      icon: '📂',
+      icon: <TypeOutline className="w-3.5 h-3.5" strokeWidth={2}/>,
       description: 'Open or close the sidebar panel',
       shortcut: 'Ctrl+B',
       keywords: ['panel', 'nav', 'menu'],
@@ -348,7 +447,7 @@ function App() {
     {
       id: 'outline',
       name: 'Toggle Outline Panel',
-      icon: '📊',
+      icon: <TypeOutline className="w-3.5 h-3.5" strokeWidth={2} />,
       description: 'Open or close the document outline & stats panel',
       shortcut: 'Ctrl+Shift+B',
       keywords: ['stats', 'tags', 'mentions', 'outline'],
@@ -357,7 +456,7 @@ function App() {
     {
       id: 'minimize',
       name: 'Minimize Window',
-      icon: '➖',
+      icon: <Minimize className="w-3.5 h-3.5" strokeWidth={2}/>,
       description: 'Minimize to system tray or taskbar',
       shortcut: 'Ctrl+M',
       keywords: ['hide', 'dock'],
@@ -366,7 +465,7 @@ function App() {
     {
       id: 'pin',
       name: 'Always on Top',
-      icon: '📌',
+      icon: <Pin className="w-3.5 h-3.5" strokeWidth={2}/>,
       description: 'Pin the window above all other apps',
       shortcut: 'Ctrl+Shift+A',
       keywords: ['pin', 'float', 'ontop'],
@@ -375,7 +474,7 @@ function App() {
     {
       id: 'close',
       name: 'Close Window',
-      icon: '✕',
+      icon: <X className="w-3.5 h-3.5" strokeWidth={2} />,
       description: 'Close the application',
       keywords: ['quit', 'exit'],
       action: () => ipcSend('window-close'),
@@ -528,7 +627,7 @@ function App() {
   if (!settingsLoaded) return null;
 
   return (
-    // root wrapper — fills the entire Electron window, flex column layout
+    <ContextMenuProvider>
     <div className={`flex h-screen w-screen flex-col select-none overflow-hidden transition-colors duration-300 ${themeClass}`}>
       {/* ---- custom title bar (pinned to top, frameless window controls) ---- */}
       <TitleBar
@@ -569,6 +668,9 @@ function App() {
               value={editorContent}
               onChange={setEditorContent}
               filename={currentFilename}
+              onSave={handleCtrlS}
+              onRename={() => setIsRenameModalOpen(true)}
+              onEmoji={() => setIsEmojiModalOpen(true)}
               fontSize={settingsValues.fontSize || 14}
               cursorStyle={settingsValues.cursorStyle || 'bar'}
               cursorWidth={settingsValues.cursorWidth || 2}
@@ -626,36 +728,20 @@ function App() {
             </SidebarGroup>
           </div>
 
-          {savedNotes.length > 0 && (
-            <div className="flex-1 min-h-0 flex flex-col px-2 py-1">
-              <div
-                className="flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/30 cursor-pointer hover:opacity-80 transition-opacity select-none"
-                onClick={() => setIsNotesCollapsed(!isNotesCollapsed)}
-              >
-                <span>Notes</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isNotesCollapsed ? '-rotate-90' : ''}`} strokeWidth={2} />
-              </div>
-              {!isNotesCollapsed && (
-                <div className="flex-1 min-h-0">
-                  <Virtuoso
-                    totalCount={savedNotes.length}
-                    computeItemKey={(index) => savedNotes[index]}
-                    itemContent={(index) => {
-                      const note = savedNotes[index];
-                      const isActive = currentFilename === note + '.md';
-                      return (
-                        <NoteItem
-                          note={note}
-                          isActive={isActive}
-                          onLoad={() => loadNote(note)}
-                        />
-                      );
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+          <NotesSection
+            notes={savedNotes}
+            currentFilename={currentFilename}
+            loadNote={loadNote}
+            isNotesCollapsed={isNotesCollapsed}
+            setIsNotesCollapsed={setIsNotesCollapsed}
+            isDeleteConfirmOpen={isDeleteConfirmOpen}
+            setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            setSavedNotes={setSavedNotes}
+            setIsEmojiModalOpen={setIsEmojiModalOpen}
+            iconTargetRef={iconTargetRef}
+            noteIcons={noteIcons}
+            handleSetIcon={handleSetIcon}
+          />
         </div>
 
         <SidebarDivider />
@@ -753,7 +839,28 @@ function App() {
         cancelText="Cancel"
         confirmVariant="danger"
       />
+
+      <RenameModal
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        onRename={handleRename}
+        currentName={currentFilename || ''}
+      />
+
+      <EmojiModal
+        isOpen={isEmojiModalOpen}
+        onClose={() => { setIsEmojiModalOpen(false); iconTargetRef.current = null; }}
+        onSelect={(emoji) => {
+          if (iconTargetRef.current) {
+            handleSetIcon(iconTargetRef.current, emoji);
+            iconTargetRef.current = null;
+          } else {
+            navigator.clipboard.writeText(emoji);
+          }
+        }}
+      />
     </div>
+    </ContextMenuProvider>
   );
 }
 

@@ -8,8 +8,9 @@ import { markdown, markdownLanguage, markdownKeymap } from '@codemirror/lang-mar
 import { HighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching } from '@codemirror/language';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { tags } from '@lezer/highlight';
-import { Eye, Code2, GripVertical } from 'lucide-react';
+import { Eye, Code2, GripVertical, Copy, Scissors, ClipboardPaste, Trash2, Pencil } from 'lucide-react';
 import Markdown from './Markdown';
+import { useContextMenu } from '../menu/ContextMenu';
 
 /* ── Storage helpers ─────────────────────────────────────────── */
 const STORAGE_KEY   = 'trayfocus-md-preview';
@@ -251,7 +252,12 @@ const MarkdownEditor = ({
   showLineNumbers = true,
   isLightTheme    = false,
   filename        = null,
+  onSave,
+  onRename,
+  onEmoji,
 }) => {
+  const { showContextMenu } = useContextMenu();
+  const selRef         = useRef('');
   const editorRef   = useRef(null);
   const viewRef     = useRef(null);
   const compartment        = useRef(new Compartment());
@@ -414,6 +420,50 @@ const MarkdownEditor = ({
           ref={editorRef}
           className="overflow-auto"
           style={{ width: editorW, fontFamily: fontFamily || undefined, '--cm-accent': accentHex }}
+          onMouseDown={(e) => {
+            if (e.button === 2 && viewRef.current) {
+              const v = viewRef.current;
+              selRef.current = v.state.sliceDoc(v.state.selection.main.from, v.state.selection.main.to);
+            }
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            const view = viewRef.current;
+            const hasSelection = selRef.current.length > 0;
+            showContextMenu({
+              x: e.clientX,
+              y: e.clientY,
+              items: [
+                { label: 'Copy', icon: <Copy className="w-3.5 h-3.5" />, shortcut: 'Ctrl+C', disabled: !hasSelection, action: () => {
+                  navigator.clipboard.writeText(selRef.current);
+                }},
+                { label: 'Paste', icon: <ClipboardPaste className="w-3.5 h-3.5" />, shortcut: 'Ctrl+V', action: () => {
+                  navigator.clipboard.readText().then(text => {
+                    if (view) view.dispatch(view.state.replaceSelection(text));
+                  });
+                }},
+                { label: 'Delete', icon: <Trash2 className="w-3.5 h-3.5" />, shortcut: 'Del', disabled: !hasSelection, action: () => {
+                  if (view && selRef.current) {
+                    const sel = view.state.selection.main;
+                    view.dispatch({ changes: { from: sel.from, to: sel.to } });
+                  }
+                }},
+                { type: 'divider' },
+                { label: 'Select All', icon: <Scissors className="w-3.5 h-3.5" />, shortcut: 'Ctrl+A', action: () => {
+                  if (view) {
+                    view.dispatch({ selection: { anchor: 0, head: view.state.doc.length } });
+                  }
+                }},
+                { type: 'divider' },
+                { label: 'Rename', icon: <Pencil className="w-3.5 h-3.5" />, action: () => {
+                  onRename?.();
+                }},
+                { label: 'Change Icon', icon: <span className="text-[13px]">#</span>, action: () => {
+                  onEmoji?.();
+                }},
+              ],
+            });
+          }}
         />
 
         {preview && (

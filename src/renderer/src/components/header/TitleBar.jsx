@@ -42,7 +42,9 @@ const TitleBar  = ({
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
         <button
           onClick={onToggleSidebar}
-          className="mr-3 flex items-center justify-center size-7 rounded-md transition-colors hover:bg-black/5 dark:hover:bg-white/5 [app-region:no-drag]"
+          className="mr-3 flex items-center justify-center size-7 
+          rounded-md transition-colors hover:bg-black/5 
+          dark:hover:bg-white/5 [app-region:no-drag] outline-none"
           title="Toggle sidebar"
         >
           <PanelLeftOpen className="h-4 w-4" strokeWidth={1.5} />
@@ -162,7 +164,7 @@ const TitleBar  = ({
       {/* ---- window control buttons — excluded from drag region ---- */}
       <div className="flex h-full items-center [app-region:no-drag]">
         {showMinimize && (
-<button 
+      <button 
           onClick={onMinimize}
           className="flex h-full w-11 items-center 
                     justify-center transition-colors hover:bg-[#444444]"

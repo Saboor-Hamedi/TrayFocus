@@ -39,6 +39,7 @@
     "@tailwindcss/cli": "^4.3.1",
     "@tailwindcss/vite": "^4.3.1",
     "electron-updater": "^6.8.9",
+    "emojibase": "^17.0.0",
     "highlight.js": "^11.11.1",
     "lucide-react": "^1.20.0",
     "marked": "^18.0.5",
