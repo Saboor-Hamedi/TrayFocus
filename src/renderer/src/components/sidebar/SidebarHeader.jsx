@@ -1,5 +1,5 @@
 import React from 'react';
-import { PanelLeftOpen, X } from 'lucide-react';
+import { PanelLeftOpen } from 'lucide-react';
 import { useSidebar } from './sidebarContext';
 
 const SidebarHeader = ({
@@ -39,7 +39,7 @@ const SidebarHeader = ({
         {showClose && (
           <button
             onClick={onClose}
-            className="size-8 flex items-center justify-center rounded-md transition-colors hover:bg-white/10"
+            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md transition-colors hover:bg-white/10"
             title="Close sidebar"
           >
             <PanelLeftOpen className="w-4 h-4" strokeWidth={1.5} />
