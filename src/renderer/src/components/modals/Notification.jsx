@@ -34,7 +34,7 @@ const Notification = ({ isOpen, onClose, message, type = 'info', duration = 3000
 
   if (!isOpen) return null;
 
-  const pos = { 'top-center': 'top-4 left-1/2 -translate-x-1/2', 'top-right': 'top-4 right-4', 'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2' };
+  const pos = { 'top-center': 'top-10 left-1/2 -translate-x-1/2', 'top-right': 'top-10 right-4', 'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2' };
   const s = typeMap[type] || typeMap.info;
 
   return (
