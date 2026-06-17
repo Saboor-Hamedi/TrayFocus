@@ -423,9 +423,6 @@ function App() {
         <SidebarHeader
           title="TrayFocus"
           subtitle={`v${pkg.version}`}
-          showCollapse={false}
-          showClose={true}
-          onClose={() => setIsSidebarOpen(false)}
         />
 
         <div className="flex-1 overflow-y-auto">
