@@ -165,7 +165,7 @@ export const Sidebar = memo(({
         ref={sidebarRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`fixed top-0 z-50 h-full transition-all duration-300 ease-in-out ${actualWidth} ${variantStyles[variant]} ${style.bg} ${style.border} ${pos.container} ${
+        className={`fixed top-8 z-40 h-[calc(100%-32px)] transition-all duration-300 ease-in-out ${actualWidth} ${variantStyles[variant]} ${style.bg} ${style.border} ${pos.container} ${
           isOpen ? pos.transform : pos.transform
         } ${className}`}
         style={{
