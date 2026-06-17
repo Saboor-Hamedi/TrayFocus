@@ -361,6 +361,57 @@ const Markdown = ({ content, fontSize = 14, fontFamily = '', accentColor = '' })
     return () => el.removeEventListener('click', onClick);
   }, []);
 
+  /* Mermaid diagram rendering — runs every render so saves don't lose diagrams */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const blocks = el.querySelectorAll('.cb-wrap code.language-mermaid, .hljs.language-mermaid');
+    if (blocks.length === 0) return;
+
+    // Swap un-rendered wrappers for placeholders
+    const pending = [];
+    blocks.forEach((codeEl) => {
+      const wrap = codeEl.closest('.cb-wrap');
+      if (!wrap) return;
+      const text = (codeEl.textContent || '').trim();
+      const placeholder = document.createElement('div');
+      placeholder.className = 'mermaid-placeholder';
+      placeholder.style.cssText = 'margin:0.5em 0;height:80px;display:flex;align-items:center;justify-content:center;border:1px dashed rgba(127,127,127,0.12);border-radius:6px;';
+      placeholder.innerHTML = '<span style="font-size:10px;color:rgba(127,127,127,0.3)">rendering…</span>';
+      wrap.replaceWith(placeholder);
+      pending.push({ placeholder, text });
+    });
+
+    if (!window.__mermaidPromise) {
+      window.__mermaidPromise = import('mermaid').then(m => m.default);
+    }
+
+    window.__mermaidPromise.then((mermaid) => {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
+      });
+
+      pending.forEach(({ placeholder, text }) => {
+        if (!text || !document.contains(placeholder)) return;
+
+        mermaid.render(`mermaid-${Math.random().toString(36).slice(2, 8)}`, text).then(({ svg }) => {
+          if (!document.contains(placeholder)) return;
+          const div = document.createElement('div');
+          div.className = 'mermaid-wrap';
+          div.style.cssText = 'margin:0.5em 0;display:flex;justify-content:center;overflow-x:auto;max-height:300px;';
+          div.innerHTML = svg;
+          placeholder.replaceWith(div);
+        }).catch(() => {
+          if (document.contains(placeholder)) {
+            placeholder.innerHTML = '<span style="font-size:10px;color:rgba(200,50,50,0.4)">render failed</span>';
+          }
+        });
+      });
+    });
+  });
+
   const fs = Math.max(fontSize, 11);
   const ff = fontFamily || 'inherit';
 
