@@ -384,6 +384,8 @@ function App() {
         onClose={() => ipcSend('window-close')}
       />
 
+      {/* ---- content wrapper — pushes right when sidebar opens ---- */}
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-56' : 'ml-0'}`}>
       {/* ---- main content area — fills remaining space after title bar ---- */}
       {activePage === 'chat' ? (
         <ChatPanel
@@ -403,6 +405,7 @@ function App() {
       ) : (
       <main className="flex-1" />
       )}
+      </div>
 
       {/* ---- sidebar panel (toggles in from the left) ---- */}
       <Sidebar
