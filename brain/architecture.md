@@ -46,10 +46,13 @@ const saveSettings = (data) => fs.writeFileSync(...)
 | `window-close` | `ipcMain.on` | `minimizeToTray` ? hide : close |
 | `toggle-always-on-top` | `ipcMain.on` | Toggle `win.setAlwaysOnTop()` via `event.returnValue` |
 | `settings-load` | `ipcMain.handle` | Returns parsed settings.json |
-| `settings-save` | `ipcMain.handle` | Writes to settings.json |
+| `settings-save` | `ipcMain.handle` | Writes to settings.json, then calls `updateAutoStart()` |
 | `check-for-updates` | `ipcMain.on` | `autoUpdater.checkForUpdates()` |
 | `download-update` | `ipcMain.on` | `autoUpdater.downloadUpdate()` |
 | `install-update` | `ipcMain.on` | `autoUpdater.quitAndInstall()` |
+
+### Auto-Start (`src/main/index.js:24-27`)
+When the "Launch at startup" setting is enabled, `app.setLoginItemSettings({ openAtLogin: true })` registers TrayFocus to start with Windows. Called on app startup and after every settings save via `updateAutoStart()`.
 
 ## Preload (`src/preload/index.js`)
 

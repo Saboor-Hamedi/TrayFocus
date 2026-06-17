@@ -34,7 +34,7 @@ The modal supports both **normal settings** (defined in the `settings` array) an
 ### Settings Flow
 1. User opens Settings → `setValues(initialValues)` (loaded from `settingsValues` via App.jsx)
 2. User changes a setting → `handleChange(key, value)` → updates internal `values` state → sets `isDirty = true`
-3. User clicks Save → `handleSave()` → `onSave(values)` → `settings.save(values)` → IPC to main process → writes `settings.json`
+3. User clicks Save → `handleSave()` → `onSave(values)` → `settings.save(values)` → IPC to main process → writes `settings.json` → calls `updateAutoStart()` (auto-start with Windows)
 4. User clicks Reset → `ConfirmModal` → `setValues(initialValues)` → `onReset?.()`
 5. Close (Escape or X) → if `isDirty`, shows `ConfirmModal` ("Unsaved Changes")
 
@@ -45,8 +45,8 @@ Reusable input component that reads/writes via `useSettings()` context.
 - `text` — text input
 - `number` — number input with min/max/step
 - `textarea` — multi-line text
-- `select` — dropdown with options
-- `switch` — toggle switch (`bg-blue-500` when ON)
+- `select` — dropdown with custom ChevronDown icon, `appearance-none` (no browser styling), dark option bg
+- `switch` — toggle switch (`bg-blue-500` when ON), right-aligned in input column
 - `checkbox` — checkbox
 - `color` — color picker
 - `range` — range slider

@@ -64,6 +64,14 @@ Full-featured markdown editor with **CodeMirror 6** and live preview.
 - Line numbers: subtle, transparent background
 - Active line highlight: `rgba(255,255,255,0.04)`
 - Selection: `rgba(96,165,250,0.25)` (blue tint)
+- `select-none` removed from container — text selection works properly
+
+### Cursor Styles
+- **Bar** (default): `borderLeftWidth` from `cursorWidth` setting (1-5px), blue color
+- **Block**: `background: rgba(96,165,250,0.45)` with `width: 0.6em` — terminal-style block cursor
+- **Underline**: `borderBottom` from `cursorWidth` setting, spans character width
+- Managed by `cursorCompartment` (CodeMirror `Compartment`) — reconfigured dynamically when settings change
+- Hardcoded `borderLeftWidth: 2px` removed from `buildTheme` — width flows from `cursorWidth` setting alone
 
 ### Split Pane
 - Resizable drag handle (`GripVertical` icon, 8px wide, `cursor-col-resize`)

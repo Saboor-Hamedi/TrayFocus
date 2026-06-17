@@ -26,8 +26,9 @@ Custom frameless title bar replacing native OS chrome. Renders three window cont
 ### Structure
 ```
 <div className="flex h-8 w-full...">
-  <!-- Draggable area: title + pin + update indicator -->
+  <!-- Draggable area: sidebar toggle + title + pin + update indicator -->
   <div className="[app-region:drag]">
+    <button onClick={onToggleSidebar} className="[app-region:no-drag]"><PanelLeftOpen /></button>
     <span>{title}</span>
     {pinned && <Pin />}
     <button onClick={showDropdown}><Download /></button>  <!-- update indicator -->
