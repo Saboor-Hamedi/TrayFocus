@@ -66,12 +66,14 @@ const SettingsItem = ({ setting }) => {
         );
       case 'switch':
         return (
+          <div className="flex justify-end">
           <button
             onClick={() => handleChange(setting.key, !value)}
             className={`relative w-9 h-5 rounded-full transition-colors ${value ? 'bg-blue-500' : 'bg-zinc-700'}`}
           >
             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </button>
+          </div>
         );
       case 'checkbox':
         return (
@@ -115,7 +117,7 @@ const SettingsItem = ({ setting }) => {
           {setting.description && <p className="text-[10px] text-zinc-400 mt-0.5">{setting.description}</p>}
           {error && <p className="text-[10px] text-red-400 mt-1">{error}</p>}
         </div>
-        <div className="flex-shrink-0 min-w-[90px]">{renderInput()}</div>
+        <div className="flex-shrink-0 w-[160px]">{renderInput()}</div>
       </div>
     </div>
   );
