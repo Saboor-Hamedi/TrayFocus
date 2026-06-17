@@ -78,15 +78,37 @@ const CommandPalette = ({
       all.push(...sc
         .filter(s => s.description.toLowerCase().includes(lower))
         .map(s => ({ ...s, kind: 'shortcut', label: s.description, score: 3 })));
+    } else {
+      const notes = spotlightExtras.notes || [];
+      all.push(...notes
+        .filter(n => n.toLowerCase().includes(lower))
+        .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
     }
-
-    const notes = spotlightExtras.notes || [];
-    all.push(...notes
-      .filter(n => n.toLowerCase().includes(lower))
-      .map(n => ({ id: `note-${n}`, kind: 'note', label: n, name: `${n}.md`, action: () => spotlightExtras.onOpenNote?.(n), score: 8 })));
 
     return all.sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 12);
   }, [isSpotlight, commands, spotlightExtras]);
+
+  // Last 5 notes as suggestions when palette opens with empty query
+  const suggestions = useMemo(() => {
+    const notes = spotlightExtras.notes || [];
+    return notes.slice(0, 5).map(n => ({
+      id: `note-${n}`,
+      kind: 'note',
+      label: n,
+      name: `${n}.md`,
+      action: () => spotlightExtras.onOpenNote?.(n),
+    }));
+  }, [spotlightExtras.notes]);
+
+  // Top commands for spotlight suggestions on empty query
+  const spotlightSuggestions = useMemo(() => {
+    const top = commands.slice(0, 5).map(c => ({
+      ...c,
+      kind: 'command',
+      label: c.name,
+    }));
+    return top;
+  }, [commands]);
 
   const score = (name, keywords = [], q) => {
     const combined = `${name.toLowerCase()} ${keywords.join(' ').toLowerCase()}`;
@@ -95,12 +117,12 @@ const CommandPalette = ({
 
   useEffect(() => {
     if (!query.trim()) {
-      setResults([]);
+      setResults(isSpotlight ? spotlightSuggestions : suggestions);
       return;
     }
     setResults(filterResults(query));
     setSelectedIndex(0);
-  }, [query, filterResults]);
+  }, [query, filterResults, isSpotlight, suggestions]);
 
   useEffect(() => {
     if (isOpen) { setSearch(mode === 'spotlight' ? '> ' : ''); setInternalMode(null); setSelectedIndex(0); setTimeout(() => inputRef.current?.focus(), 20); }
@@ -180,15 +202,11 @@ const CommandPalette = ({
           </div>
 
           <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
-            {!isSpotlight && !query.trim() ? (
+            {!query.trim() && suggestions.length === 0 ? (
               <div className="px-4 py-6 text-center text-white/20">
-                <p className="text-xs">Type to search notes from your vault</p>
+                <p className="text-xs">No notes in your vault yet</p>
               </div>
-            ) : !isSpotlight && query.trim() && results.length === 0 ? (
-              <div className="px-4 py-6 text-center text-white/20">
-                <p className="text-xs">{emptyMessage}</p>
-              </div>
-            ) : results.length === 0 && query.trim() ? (
+            ) : query.trim() && results.length === 0 ? (
               <div className="px-4 py-6 text-center text-white/20">
                 <p className="text-xs">{emptyMessage}</p>
               </div>
