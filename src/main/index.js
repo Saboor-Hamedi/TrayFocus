@@ -21,12 +21,8 @@ const saveSettings = (data) => {
 
 const getMinimizeToTray = () => loadSettings().minimizeToTray !== false
 
-ipcMain.on('settings-load', (event) => {
-  event.returnValue = loadSettings()
-})
-ipcMain.on('settings-save', (_e, data) => {
-  saveSettings(data)
-})
+ipcMain.handle('settings-load', () => loadSettings())
+ipcMain.handle('settings-save', (_e, data) => saveSettings(data))
 
 let mainWindow = null
 let tray = null
