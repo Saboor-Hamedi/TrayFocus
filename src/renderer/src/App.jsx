@@ -147,6 +147,30 @@ function App() {
   // These are the actions that appear when the user opens the palette
   const commands = useMemo(() => [
     {
+      id: 'nav-chat',
+      name: 'Chat',
+      icon: '💬',
+      description: 'Switch to the Chat page',
+      keywords: ['ai', 'assistant', 'gpt'],
+      action: () => setActivePage('chat'),
+    },
+    {
+      id: 'nav-home',
+      name: 'Home',
+      icon: '🏠',
+      description: 'Switch to the Home page',
+      keywords: ['dashboard', 'main'],
+      action: () => setActivePage('home'),
+    },
+    {
+      id: 'nav-markdown',
+      name: 'Markdown',
+      icon: '📝',
+      description: 'Switch to the Markdown editor',
+      keywords: ['editor', 'write'],
+      action: () => setActivePage('markdown'),
+    },
+    {
       id: 'settings',
       name: 'Open Settings',
       icon: '⚙️',

@@ -42,7 +42,7 @@ const TitleBar  = ({
       <div className="flex h-full flex-1 items-center px-3 [app-region:drag]">
         <button
           onClick={onToggleSidebar}
-          className="mr-3 flex items-center justify-center size-7 rounded-md transition-colors hover:bg-white/5 [app-region:no-drag]"
+          className="mr-3 flex items-center justify-center size-7 rounded-md transition-colors hover:bg-black/5 dark:hover:bg-white/5 [app-region:no-drag]"
           title="Toggle sidebar"
         >
           <PanelLeftOpen className="h-4 w-4" strokeWidth={1.5} />
@@ -62,7 +62,7 @@ const TitleBar  = ({
                 ? 'bg-blue-500/10 text-blue-400'
                 : hasUpdate
                   ? 'text-blue-400 hover:bg-blue-500/10'
-                  : 'text-white/20 hover:text-white/40 hover:bg-white/5'
+                  : 'text-black/30 dark:text-white/20 hover:text-black/50 dark:hover:text-white/40 hover:bg-black/5 dark:hover:bg-white/5'
           }`}
           title={updateStatus?.status === 'downloaded' ? 'Restart to update' : 'Updates'}
         >
