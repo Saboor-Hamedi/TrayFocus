@@ -27,6 +27,7 @@ const buildTheme = (fs) => EditorView.theme({
     caretColor: '#60a5fa',
     lineHeight: '1.65',
   },
+  '.cm-line': { whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.025)' },
   '.cm-activeLineGutter': { background: 'rgba(255,255,255,0.02)' },
   '.cm-selectionBackground, ::selection': { background: 'rgba(96,165,250,0.22) !important' },
