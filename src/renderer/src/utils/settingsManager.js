@@ -32,7 +32,7 @@ export async function load() {
   const r = ipc();
   if (!r) { cache = { ...defaults }; return { ...cache }; }
   try {
-    cache = { ...defaults, ...(await r.invoke('settings-load')) };
+    cache = { ...defaults, ...r.sendSync('settings-load') };
   } catch {
     cache = { ...defaults };
   }
@@ -43,7 +43,7 @@ export async function save(partial) {
   cache = { ...(cache || defaults), ...partial };
   const r = ipc();
   if (!r) return;
-  try { await r.invoke('settings-save', cache) } catch { /* ignore */ }
+  try { r.send('settings-save', cache) } catch { /* ignore */ }
 }
 
 export async function loadTheme() {
