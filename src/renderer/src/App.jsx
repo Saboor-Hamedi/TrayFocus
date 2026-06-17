@@ -344,7 +344,7 @@ function App() {
   }), [accentClass]);
 
   const sidebarStyle = useMemo(() => ({
-    bg: theme.bg,
+    bg: 'bg-[#f6f6f7] dark:bg-zinc-900/80',
     border: 'border-black/10 dark:border-white/10',
     text: theme.text,
     textMuted: 'text-black/40 dark:text-white/40',

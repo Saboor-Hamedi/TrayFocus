@@ -22,7 +22,7 @@ const buildTheme = (fs) => EditorView.theme({
     background: 'transparent',
   },
   '.cm-content': {
-    padding: '16px',
+    padding: '8px 12px',
     fontFamily: 'ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace',
     caretColor: '#60a5fa',
     lineHeight: '1.65',
@@ -241,7 +241,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
                 scrollbarColor: 'rgba(255,255,255,0.07) transparent',
               }}
             >
-              <div className="px-5 py-4">
+              <div className="px-4 py-3">
                 {content
                   ? <Markdown
                       content={content}
