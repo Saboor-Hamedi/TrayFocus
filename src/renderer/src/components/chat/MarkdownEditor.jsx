@@ -250,6 +250,7 @@ const MarkdownEditor = ({
   wrapLines       = true,
   showLineNumbers = true,
   isLightTheme    = false,
+  filename        = null,
 }) => {
   const editorRef   = useRef(null);
   const viewRef     = useRef(null);
@@ -384,7 +385,9 @@ const MarkdownEditor = ({
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-black/10 dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02] shrink-0 [app-region:no-drag]">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-medium text-black/40 dark:text-white/30 tracking-wide">Markdown</span>
+          <span className="text-[10px] font-medium text-black/40 dark:text-white/30 tracking-wide">
+            {filename || 'Untitled'}
+          </span>
           {preview && (
             <span className="text-[9px] text-black/20 dark:text-white/15 border border-black/10 dark:border-white/[0.06] rounded px-1 py-px">split</span>
           )}

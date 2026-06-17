@@ -510,6 +510,7 @@ function App() {
             <MarkdownEditor
               value={editorContent}
               onChange={setEditorContent}
+              filename={currentFilename}
               fontSize={settingsValues.fontSize || 14}
               cursorStyle={settingsValues.cursorStyle || 'bar'}
               cursorWidth={settingsValues.cursorWidth || 2}
