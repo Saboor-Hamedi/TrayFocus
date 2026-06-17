@@ -385,7 +385,7 @@ function App() {
       />
 
       {/* ---- content wrapper — pushed right when sidebar opens (TitleBar stays full width) ---- */}
-      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'pl-56' : 'pl-0'}`}>
+      <div className={`flex-1 transition-all duration-300 overflow-hidden ${isSidebarOpen ? 'pl-56' : 'pl-0'}`}>
 
       {/* ---- main content area — fills remaining space after title bar ---- */}
       {activePage === 'chat' ? (
