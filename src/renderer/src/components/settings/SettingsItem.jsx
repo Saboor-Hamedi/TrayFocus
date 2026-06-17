@@ -1,10 +1,10 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useSettings } from '../modals/SettingsModal';
 
 const SettingsItem = ({ setting }) => {
   const { values, handleChange, errors, style } = useSettings();
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const value = values[setting.key] ?? setting.defaultValue ?? '';
   const error = errors[setting.key];
