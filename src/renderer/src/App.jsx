@@ -55,21 +55,23 @@ function App() {
   // Whether the shortcut cheatsheet is open
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
 
-  // Active content page
-  const [activePage, setActivePage] = useState(() => {
-    try { return localStorage.getItem('trayfocus-page') || 'chat'; } catch { return 'chat'; }
-  });
-
-  // Sync active page to localStorage (instant) and settings (persistent)
-  useEffect(() => { try { localStorage.setItem('trayfocus-page', activePage); } catch {}; settings.save({ activePage }); }, [activePage]);
+  // Active content page — will be immediately overwritten by settings.load()
+  const [activePage, setActivePage] = useState('chat');
 
   // Currently active theme ID — loaded from settings.json on mount
   const [activeTheme, setActiveTheme] = useState('zinc');
 
   // Persistent settings loaded from settings.json
+  // These must be declared BEFORE the activePage useEffect that references settingsLoaded.
   const [settingsValues, setSettingsValues] = useState({});
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+
+  // Sync active page to settings.json when it changes.
+  // Guard with settingsLoaded so we never save before load() has completed.
+  useEffect(() => {
+    if (settingsLoaded) settings.save({ activePage });
+  }, [activePage, settingsLoaded]);
 
   useEffect(() => {
     settings.load().then((data) => {
@@ -328,6 +330,11 @@ function App() {
     scrollbar: 'scrollbar-thumb-zinc-700',
     shadow: 'shadow-2xl',
   }), [theme, accentClass]);
+
+  // Block render until settings are loaded from disk.
+  // This prevents the theme-flicker where the app paints with the default
+  // theme and then transitions to the saved one once the IPC call resolves.
+  if (!settingsLoaded) return null;
 
   return (
     // root wrapper — fills the entire Electron window, flex column layout

@@ -54,19 +54,3 @@ export function getThemeClass(id) {
 export function getAccentClass(id) {
   return getTheme(id).accent
 }
-
-// Read saved theme from localStorage, with safe default
-export function loadTheme() {
-  try {
-    return localStorage.getItem('trayfocus-theme') || defaultThemeId
-  } catch {
-    return defaultThemeId
-  }
-}
-
-// Persist theme choice to localStorage
-export function saveTheme(id) {
-  try {
-    localStorage.setItem('trayfocus-theme', id)
-  } catch { /* ignore when storage is unavailable */ }
-}

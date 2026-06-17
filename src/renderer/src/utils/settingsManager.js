@@ -1,8 +1,6 @@
 // Renderer-side settings manager.
-// Uses localStorage for instant cache + IPC invoke for disk persistence.
-// Falls back to localStorage if IPC is not available.
-
-const STORAGE_KEY = 'trayfocus-settings';
+// Single source of truth: settings.json in AppData (via IPC).
+// No localStorage — all reads/writes go through the main process.
 
 const defaults = {
   theme: 'zinc',
@@ -24,38 +22,40 @@ const defaults = {
   activePage: 'chat',
 };
 
-function readLocal() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {} } catch { return {} }
-}
-function writeLocal(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch {}
-}
-
 let cache = null;
+let loadPromise = null; // deduplicates concurrent load() calls
 
 export async function load() {
   if (cache) return { ...cache };
 
-  // 1. Try localStorage first (instant, always works)
-  const local = readLocal();
-  if (Object.keys(local).length > 0) {
-    cache = { ...defaults, ...local };
-    // 2. Sync from disk in background (more recent on other sessions)
-    try { const r = window.electron?.ipcRenderer; if (r) { const disk = await r.invoke('settings-load'); cache = { ...cache, ...disk }; } } catch {}
-  } else {
-    // 3. No localStorage — try disk
-    cache = { ...defaults };
-    try { const r = window.electron?.ipcRenderer; if (r) { cache = { ...cache, ...(await r.invoke('settings-load')) }; } } catch {}
-  }
+  // If a load is already in-flight, wait for it instead of firing a second IPC call
+  if (loadPromise) return loadPromise.then(() => ({ ...cache }));
 
-  writeLocal(cache);
+  loadPromise = (async () => {
+    try {
+      const r = window.electron?.ipcRenderer;
+      const disk = r ? await r.invoke('settings-load') : {};
+      cache = { ...defaults, ...disk };
+    } catch {
+      cache = { ...defaults };
+    }
+    loadPromise = null;
+  })();
+
+  await loadPromise;
   return { ...cache };
 }
 
 export async function save(partial) {
-  cache = { ...(cache || defaults), ...partial };
-  writeLocal(cache);
-  try { const r = window.electron?.ipcRenderer; if (r) await r.invoke('settings-save', cache) } catch {}
+  // Ensure we have a full base before merging a partial update.
+  // This prevents clobbering disk data with bare defaults on early saves.
+  if (!cache) await load();
+
+  cache = { ...cache, ...partial };
+  try {
+    const r = window.electron?.ipcRenderer;
+    if (r) await r.invoke('settings-save', cache);
+  } catch {}
 }
 
 export async function loadTheme() {
