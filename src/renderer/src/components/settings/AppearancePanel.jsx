@@ -21,7 +21,8 @@ const appearanceSettings = [
     ],
   },
   { key: 'cursorWidth', category: 'appearance', label: 'Cursor width', description: 'Width of the bar cursor in px (1–4)', type: 'number', defaultValue: 2, min: 1, max: 4, step: 1 },
-  { key: 'editorWrapLines', category: 'appearance', label: 'Word wrap', description: 'Wrap long lines in the markdown editor', type: 'switch', defaultValue: true },
+  { key: 'editorWrapLines',   category: 'appearance', label: 'Word wrap',     description: 'Wrap long lines in the markdown editor',   type: 'switch', defaultValue: true },
+  { key: 'editorLineNumbers', category: 'appearance', label: 'Line numbers',  description: 'Show line numbers in the markdown editor',  type: 'switch', defaultValue: true },
   { key: 'compactMode', category: 'appearance', label: 'Compact mode', description: 'Reduce spacing for a denser layout', type: 'switch', defaultValue: false },
   { key: 'animationsEnabled', category: 'appearance', label: 'Animations', description: 'Enable UI transition animations', type: 'switch', defaultValue: true },
 ];

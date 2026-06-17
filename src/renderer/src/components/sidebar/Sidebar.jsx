@@ -80,19 +80,19 @@ export const Sidebar = memo(({
   // Theme styles
   const themes = {
     dark: {
-      bg: 'bg-zinc-900/95',
-      border: 'border-zinc-800',
-      text: 'text-white',
-      textMuted: 'text-zinc-400',
-      hover: 'hover:bg-zinc-800/50',
-      active: 'bg-blue-500/20 text-blue-400',
-      activeBg: 'bg-blue-500/10',
-      divider: 'border-zinc-800',
-      scrollbar: 'scrollbar-thumb-zinc-700',
-      shadow: 'shadow-2xl'
+      bg: 'bg-black/60 backdrop-blur-xl',
+      border: 'border-white/[0.07]',
+      text: 'text-white/90',
+      textMuted: 'text-white/35',
+      hover: 'hover:bg-white/[0.06]',
+      active: 'bg-white/[0.1] text-white',
+      activeBg: 'bg-white/[0.07]',
+      divider: 'border-white/[0.06]',
+      scrollbar: 'scrollbar-thumb-white/10',
+      shadow: 'shadow-[0_0_40px_rgba(0,0,0,0.6)]',
     },
     light: {
-      bg: 'bg-white/95',
+      bg: 'bg-white/95 backdrop-blur-xl',
       border: 'border-gray-200',
       text: 'text-gray-900',
       textMuted: 'text-gray-500',
@@ -101,8 +101,8 @@ export const Sidebar = memo(({
       activeBg: 'bg-blue-50',
       divider: 'border-gray-200',
       scrollbar: 'scrollbar-thumb-gray-300',
-      shadow: 'shadow-2xl'
-    }
+      shadow: 'shadow-2xl',
+    },
   };
 
   // Theme resolution — accepts string preset or a custom style object

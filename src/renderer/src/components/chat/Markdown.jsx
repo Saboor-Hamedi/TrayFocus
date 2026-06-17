@@ -64,7 +64,7 @@ const injectGlobalStyles = () => {
     }
     .md-prose a:hover { opacity: 0.75; }
 
-    /* ── HR ─────────────────────────────────────────────────── */
+    /* ── HR ───────────────────────────────────────────────────    /* Horizontal rule */
     .md-prose hr {
       border: 0;
       border-top: 1px solid rgba(255,255,255,0.07);
@@ -75,6 +75,14 @@ const injectGlobalStyles = () => {
     .md-prose strong { font-weight: 700; color: rgba(255,255,255,0.92); }
     .md-prose em { font-style: italic; color: rgba(255,255,255,0.72); }
     .md-prose del { text-decoration: line-through; color: rgba(255,255,255,0.35); }
+
+    /* ── Tags & mentions ─────────────────────────────────────── */
+    .md-prose .md-tag,
+    .md-prose .md-mention {
+      color: var(--md-accent, #60a5fa);
+      font-weight: 500;
+      opacity: 0.9;
+    }
 
     /* ── Inline code ─────────────────────────────────────────── */
     .md-prose :not(pre) > code {
@@ -148,7 +156,9 @@ const injectGlobalStyles = () => {
       height: 0.95em;
       border: 1.5px solid rgba(255,255,255,0.22);
       border-radius: 3px;
-      margin-top: 0.22em;
+      /* Center the box with the first line of text:
+         line-height=1.7, box=0.95em → top = (1.7-0.95)/2 = 0.375em */
+      margin-top: 0.375em;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -273,6 +283,34 @@ const fallbackCopy = (text) => {
   document.body.removeChild(ta);
 };
 
+/* ── Preprocess raw markdown before parsing ──────────────────── */
+// Converts `. item` (dot-space) at start of lines into `- item`
+// so the user can use `.` as a bullet marker.  Skips code fences.
+const preprocessMarkdown = (raw) => {
+  const lines = raw.split('\n');
+  let inFence = false;
+  return lines.map((line) => {
+    if (/^\s*```/.test(line)) { inFence = !inFence; return line; }
+    if (inFence) return line;
+    // Match optional leading whitespace then exactly one dot then a space
+    return line.replace(/^(\s*)\.(\s+)/, '$1-$2');
+  }).join('\n');
+};
+
+/* ── Post-process HTML: highlight #tag and @mention ─────────── */
+// Splits on <code>/<pre> blocks so we never modify code content.
+const CODE_BLOCK_RE = /(<(?:code|pre)\b[^>]*>[\s\S]*?<\/(?:code|pre)>)/gi;
+const TAG_RE      = /((?:^|(?<=[\s>.,;!?(]))(#\w+))/g;
+const MENTION_RE  = /((?:^|(?<=[\s>.,;!?(]))(@\w+))/g;
+
+const addTagsMentions = (rawHtml) =>
+  rawHtml.split(CODE_BLOCK_RE).map((chunk, i) => {
+    if (i % 2 === 1) return chunk; // inside code block — skip
+    return chunk
+      .replace(/(^|[\s>.,;!?(])(#\w+)/g, '$1<span class="md-tag">$2</span>')
+      .replace(/(^|[\s>.,;!?(])(@\w+)/g, '$1<span class="md-mention">$2</span>');
+  }).join('');
+
 /* ── Component ───────────────────────────────────────────────── */
 const Markdown = ({ content, fontSize = 14, fontFamily = '', accentColor = '' }) => {
   const ref = useRef(null);
@@ -281,8 +319,11 @@ const Markdown = ({ content, fontSize = 14, fontFamily = '', accentColor = '' })
   const accentHex = COLOR_MAP[accentKey] || '#60a5fa';
 
   const html = useMemo(() => {
-    try { return marked.parse(content, { async: false, renderer }); }
-    catch { return content; }
+    try {
+      const preprocessed = preprocessMarkdown(content);
+      const raw = marked.parse(preprocessed, { async: false, renderer });
+      return addTagsMentions(raw);
+    } catch { return content; }
   }, [content]);
 
   /* Delegated copy button handler */

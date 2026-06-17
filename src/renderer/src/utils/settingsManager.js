@@ -14,6 +14,7 @@ const defaults = {
   cursorStyle: 'bar',
   cursorWidth: 2,
   editorWrapLines: true,
+  editorLineNumbers: true,
   compactMode: false,
   animationsEnabled: true,
   checkUpdates: true,

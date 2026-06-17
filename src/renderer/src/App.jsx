@@ -402,6 +402,8 @@ function App() {
           cursorStyle={settingsValues.cursorStyle || 'bar'}
           cursorWidth={settingsValues.cursorWidth || 2}
           wrapLines={settingsValues.editorWrapLines ?? true}
+          showLineNumbers={settingsValues.editorLineNumbers ?? true}
+          isLightTheme={getTheme(activeTheme)?.bg?.includes('#ffffff') || getTheme(activeTheme)?.bg === 'bg-white'}
           accentColor={accentClass}
         />
       ) : (
