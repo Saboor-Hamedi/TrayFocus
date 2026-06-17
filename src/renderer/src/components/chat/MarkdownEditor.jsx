@@ -185,7 +185,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
 
   return (
     <div
-      className="flex flex-col h-full border border-white/[0.06] rounded-xl overflow-hidden"
+      className="flex flex-col h-full border-y border-r border-white/[0.06] rounded-xl overflow-hidden"
       ref={containerRef}
     >
       {/* Toolbar */}
