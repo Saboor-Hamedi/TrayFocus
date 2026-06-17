@@ -55,7 +55,7 @@ const SettingsItem = ({ setting }) => {
             <select
               value={value}
               onChange={(e) => handleChange(setting.key, e.target.value)}
-              className={`w-full px-2.5 py-1.5 text-xs rounded-md border appearance-none cursor-pointer ${style.input} ${style.inputFocus} outline-none transition-all ${error ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
+              className={`w-full px-2.5 py-1.5 text-xs rounded-md border appearance-none cursor-pointer ${style.input} outline-none ${error ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
             >
               {setting.options?.map(option => (
                 <option key={option.value} value={option.value} className="bg-zinc-900 text-white">{option.label}</option>
