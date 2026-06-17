@@ -39,7 +39,7 @@ const buildTheme = (fs) => EditorView.theme({
     paddingRight: '8px',
   },
   '.cm-lineNumbers .cm-gutterElement': { minWidth: '32px', textAlign: 'right' },
-  '.cm-cursor': { borderLeftColor: '#60a5fa', borderLeftWidth: '2px' },
+  '.cm-cursor': { borderLeftColor: '#60a5fa' },
   '.cm-focused': { outline: 'none' },
   '.cm-scroller': { overflow: 'auto' },
   '& ::-webkit-scrollbar': { width: '5px', height: '5px' },
