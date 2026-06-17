@@ -53,20 +53,17 @@ const buildCursorTheme = (style, width) => {
   const styles = {};
   if (style === 'block') {
     styles['.cm-cursor'] = {
-      borderLeftWidth: '0.6em',
-      borderLeftColor: 'rgba(96,165,250,0.75)',
-      background: 'transparent',
-      marginLeft: '-0.3em',
+      border: 'none',
+      background: 'rgba(96,165,250,0.45)',
+      width: '0.6em',
     };
   } else if (style === 'underline') {
     styles['.cm-cursor'] = {
       borderLeftWidth: '0',
       borderBottom: `${Math.max(width, 1)}px solid rgba(96,165,250,0.85)`,
       width: '0.6em',
-      top: 'auto',
     };
   } else {
-    // bar (default)
     styles['.cm-cursor'] = {
       borderLeftWidth: `${Math.max(width, 1)}px`,
       borderLeftColor: '#60a5fa',
@@ -188,7 +185,7 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
 
   return (
     <div
-      className="flex flex-col h-full border border-white/[0.06] rounded-xl overflow-hidden select-none"
+      className="flex flex-col h-full border border-white/[0.06] rounded-xl overflow-hidden"
       ref={containerRef}
     >
       {/* Toolbar */}
