@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { EditorView, keymap, placeholder, lineNumbers } from '@codemirror/view';
+import { EditorView, keymap, placeholder, lineNumbers, drawSelection } from '@codemirror/view';
 import { EditorState, Compartment } from '@codemirror/state';
-import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { markdown, markdownLanguage, markdownKeymap } from '@codemirror/lang-markdown';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Eye, Code2, GripVertical } from 'lucide-react';
 import Markdown from './Markdown';
@@ -48,11 +48,39 @@ const buildTheme = (fs) => EditorView.theme({
   '& ::-webkit-scrollbar-thumb:hover': { background: 'rgba(255,255,255,0.14)' },
 }, { dark: true });
 
+/* Build cursor style extension from settings */
+const buildCursorTheme = (style, width) => {
+  const styles = {};
+  if (style === 'block') {
+    styles['.cm-cursor'] = {
+      borderLeftWidth: '0.6em',
+      borderLeftColor: 'rgba(96,165,250,0.75)',
+      background: 'transparent',
+      marginLeft: '-0.3em',
+    };
+  } else if (style === 'underline') {
+    styles['.cm-cursor'] = {
+      borderLeftWidth: '0',
+      borderBottom: `${Math.max(width, 1)}px solid rgba(96,165,250,0.85)`,
+      width: '0.6em',
+      top: 'auto',
+    };
+  } else {
+    // bar (default)
+    styles['.cm-cursor'] = {
+      borderLeftWidth: `${Math.max(width, 1)}px`,
+      borderLeftColor: '#60a5fa',
+    };
+  }
+  return EditorView.theme(styles, { dark: true });
+};
+
 /* ── MarkdownEditor ──────────────────────────────────────────── */
-const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14, fontFamily = '', accentColor = '' }) => {
+const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14, fontFamily = '', accentColor = '', cursorStyle = 'bar', cursorWidth = 2 }) => {
   const editorRef   = useRef(null);
   const viewRef     = useRef(null);
   const compartment = useRef(new Compartment()); // for dynamic fontSize updates
+  const cursorCompartment = useRef(new Compartment()); // for dynamic cursor updates
   const [preview, setPreview]     = useState(loadPreview);
   const [content, setContent]     = useState(value);
   const [splitRatio, setSplitRatio] = useState(loadSplit);
@@ -104,15 +132,17 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
     viewRef.current = new EditorView({
       doc: value,
       extensions: [
-        EditorState.readOnly.of(readOnly),
-        lineNumbers(),
-        markdown({ base: markdownLanguage }),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
-        history(),
-        placeholder('Write markdown here…'),
-        compartment.current.of(buildTheme(fontSize)),
-        updateListener,
-      ],
+          EditorState.readOnly.of(readOnly),
+          lineNumbers(),
+          markdown({ base: markdownLanguage }),
+          keymap.of([...markdownKeymap, ...defaultKeymap, ...historyKeymap]),
+          history(),
+          drawSelection(),
+          placeholder('Write markdown here…'),
+          compartment.current.of(buildTheme(fontSize)),
+          cursorCompartment.current.of(buildCursorTheme(cursorStyle, cursorWidth)),
+          updateListener,
+        ],
       parent: editorRef.current,
     });
 
@@ -126,6 +156,14 @@ const MarkdownEditor = ({ value = '', onChange, readOnly = false, fontSize = 14,
       effects: compartment.current.reconfigure(buildTheme(fontSize)),
     });
   }, [fontSize]);
+
+  /* Dynamically reconfigure cursor theme when cursorStyle/cursorWidth changes */
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: cursorCompartment.current.reconfigure(buildCursorTheme(cursorStyle, cursorWidth)),
+    });
+  }, [cursorStyle, cursorWidth]);
 
   /* Ctrl+\ toggles preview */
   useEffect(() => {

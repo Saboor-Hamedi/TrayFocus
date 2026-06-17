@@ -368,7 +368,12 @@ function App() {
           accentColor={accentClass}
         />
       ) : activePage === 'markdown' ? (
-        <MarkdownEditor fontSize={settingsValues.fontSize || 14} accentColor={accentClass} />
+        <MarkdownEditor
+          fontSize={settingsValues.fontSize || 14}
+          cursorStyle={settingsValues.cursorStyle || 'bar'}
+          cursorWidth={settingsValues.cursorWidth || 2}
+          accentColor={accentClass}
+        />
       ) : (
       <main className="flex-1" />
       )}

@@ -11,6 +11,8 @@ const defaults = {
   accent: 'blue',
   displayName: 'User',
   fontSize: 14,
+  cursorStyle: 'bar',
+  cursorWidth: 2,
   compactMode: false,
   animationsEnabled: true,
   checkUpdates: true,

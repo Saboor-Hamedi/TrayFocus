@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useSettings } from '../modals/SettingsModal';
 
 const SettingsItem = ({ setting }) => {
@@ -50,17 +51,18 @@ const SettingsItem = ({ setting }) => {
         );
       case 'select':
         return (
-          <select
-            value={value}
-            onChange={(e) => handleChange(setting.key, e.target.value)}
-            className={`w-full px-2.5 py-1.5 text-xs rounded-md border ${style.input} ${style.inputFocus} outline-none transition-all ${
-              error ? 'border-red-500 ring-1 ring-red-500/20' : ''
-            }`}
-          >
-            {setting.options?.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={value}
+              onChange={(e) => handleChange(setting.key, e.target.value)}
+              className={`w-full px-2.5 py-1.5 text-xs rounded-md border appearance-none cursor-pointer ${style.input} ${style.inputFocus} outline-none transition-all ${error ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
+            >
+              {setting.options?.map(option => (
+                <option key={option.value} value={option.value} className="bg-zinc-900 text-white">{option.label}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20 pointer-events-none" strokeWidth={2} />
+          </div>
         );
       case 'switch':
         return (
